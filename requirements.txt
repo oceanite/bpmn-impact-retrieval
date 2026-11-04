@@ -1,0 +1,26 @@
+# BPMN parsing
+lxml>=5.0
+
+# Retrieval
+rank-bm25==0.2.2
+scikit-learn>=1.4
+
+# Preprocessing (stopwords, Porter stemmer)
+nltk>=3.8
+
+# Code extraction (add the grammar package for Simple-ERP's language once known,
+# e.g. tree-sitter-python / tree-sitter-javascript / tree-sitter-php)
+tree-sitter>=0.23
+
+# Data / config
+pandas>=2.1
+PyYAML>=6.0
+
+# Web
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+jinja2>=3.1
+
+# Tests
+pytest>=8.0

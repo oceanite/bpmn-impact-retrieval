@@ -1,0 +1,17 @@
+[project]
+name = "impact-retrieval"
+version = "0.1.0"
+description = "BPMN change impact retrieval over the Simple-ERP codebase (Group 9)"
+requires-python = ">=3.10"
+# Dependencies are listed in requirements.txt
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

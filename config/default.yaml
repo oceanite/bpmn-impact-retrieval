@@ -1,0 +1,39 @@
+# All tunable parameters live here.
+
+paths:
+  target_repo: data/target_repo
+  scenarios: data/bpmn/scenarios
+  ground_truth: data/ground_truth/ground_truth.csv
+
+code_extraction:
+  include_extensions: [".py", ".js", ".ts", ".java", ".php", ".sql", ".yaml", ".yml", ".json"]
+  exclude_dirs: [".git", "node_modules", "vendor", "dist", "build", "__pycache__"]
+  unit: function   # function | file
+
+preprocessing:
+  split_identifiers: true   # camelCase / snake_case
+  lowercase: true
+  remove_stopwords: true
+  stemming: porter          # porter | none
+  min_token_length: 2
+
+retrieval:
+  method: bm25              # bm25 | keyword | tfidf
+  top_k: 10
+  bm25:
+    k1: 1.5
+    b: 0.75
+  # Multiplier applied per document field when building the index
+  field_weights:
+    path: 2.0
+    name: 3.0
+    route: 2.0
+    db_table: 2.0
+    comment: 1.0
+    config: 1.0
+    test: 0.5
+    body: 1.0
+
+evaluation:
+  k_values: [1, 3, 5, 10]
+  match_level: file         # file | function
