@@ -90,7 +90,8 @@ Team task list: [`docs/TASKS.md`](docs/TASKS.md).
 ## Website (final deliverable)
 
 - **Mapping page** — upload/select old + new BPMN, view detected changes and the
-  ranked results with evidence; choose BM25 or baseline.
+  ranked results with evidence; choose BM25 or baseline. Optionally upload a ZIP of
+  another codebase (Go / TypeScript / SQL / YAML / JSON) instead of Simple-ERP.
 - **Evaluation page** — compare against the ground truth: TP/FP/FN per file,
   Precision@k, Recall@k, F1@k, MRR, FPR, latency; BM25 vs baseline side by side;
   adjustable k.

@@ -14,6 +14,8 @@
       </label>
       <label>Old BPMN <input type="file" name="old_file" accept=".bpmn,.xml"></label>
       <label>New BPMN <input type="file" name="new_file" accept=".bpmn,.xml"></label>
+      <label>Source code ZIP (optional, default: Simple-ERP)
+        <input type="file" name="code_zip" accept=".zip"></label>
       <label>Method
         <select name="method">
           {% for m in methods %}<option {% if m == selected.method %}selected{% endif %}>{{ m }}</option>{% endfor %}
@@ -48,6 +50,7 @@
 
 <section>
   <h2>3. Ranked impact ({{ report.method }}, top {{ report.results|length }}, {{ '%.1f'|format(report.latency_ms) }} ms)</h2>
+  <p>Target codebase: <strong>{{ report.params.corpus }}</strong> · {{ report.params.documents }} documents indexed</p>
   <div class="table-wrap"><table>
     <tr><th>#</th><th>Score</th><th>File</th><th>Function</th><th>Kind</th><th>Evidence (term @ field)</th></tr>
     {% for r in report.results %}

@@ -24,8 +24,6 @@ from impact_retrieval.pipeline import ImpactPipeline  # noqa: E402
 from impact_retrieval.retrieval import METHODS  # noqa: E402
 from impact_retrieval.types import FIELDS  # noqa: E402
 
-MAX_UPLOAD_BYTES = 5 * 1024 * 1024
-
 app = FastAPI(title="BPMN Change Impact Retrieval")
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 DEFAULTS = load_config()
@@ -73,35 +71,40 @@ def mapping_form(request: Request):
 @app.post("/", response_class=HTMLResponse)
 async def mapping_run(request: Request, scenario: str = Form(""), method: str = Form("bm25"),
                       old_file: UploadFile | None = File(None), new_file: UploadFile | None = File(None),
+                      code_zip: UploadFile | None = File(None),
                       k1: float | None = Form(None), b: float | None = Form(None), top_k: int | None = Form(None)):
     form = dict(await request.form())
     cfg = load_config(overrides=_overrides(k1, b, top_k, _weights_from(form)))
-    pipe = ImpactPipeline(cfg=cfg)
+    limits = cfg.get("upload", {})
     report, error = None, None
     try:
-        old_bytes = await _read_upload(old_file)
-        new_bytes = await _read_upload(new_file)
+        zip_bytes = await _read_upload(code_zip, int(limits.get("max_zip_mb", 50)))
+        pipe = (ImpactPipeline.from_zip(zip_bytes, cfg, label=code_zip.filename) if zip_bytes
+                else ImpactPipeline(cfg=cfg))
+        old_bytes = await _read_upload(old_file, int(limits.get("max_bpmn_mb", 5)))
+        new_bytes = await _read_upload(new_file, int(limits.get("max_bpmn_mb", 5)))
         if old_bytes and new_bytes:
             report = pipe.run(old_bytes, new_bytes, method=method)
         elif scenario:
             report = pipe.run_scenario(scenario, method=method)
         else:
             error = "Choose a scenario or upload both an old and a new BPMN file."
-    except (BpmnParseError, FileNotFoundError, ValueError) as exc:
+    except (BpmnParseError, FileNotFoundError, ValueError) as exc:   # ArchiveError is a ValueError
         error = str(exc)
     return templates.TemplateResponse(request, "mapping.html", {
-        "scenarios": pipe.scenarios(), "methods": METHODS, "report": report, "error": error,
+        "scenarios": ImpactPipeline(cfg=cfg).scenarios(), "methods": METHODS, "report": report, "error": error,
         "selected": {"scenario": scenario, "method": method},
         "settings": _settings_context(cfg), "fields": FIELDS})
 
 
-async def _read_upload(upload: UploadFile | None) -> bytes | None:
+async def _read_upload(upload: UploadFile | None, max_mb: int) -> bytes | None:
     if upload is None or not upload.filename:
         return None
-    data = await upload.read(MAX_UPLOAD_BYTES + 1)
-    if len(data) > MAX_UPLOAD_BYTES:
-        raise ValueError(f"{upload.filename} is larger than 5 MB")
-    return data
+    limit = max_mb * 1024 * 1024
+    data = await upload.read(limit + 1)
+    if len(data) > limit:
+        raise ValueError(f"{upload.filename} is larger than {max_mb} MB")
+    return data or None
 
 
 # --------------------------------------------------------------------------- evaluation page

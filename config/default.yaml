@@ -12,6 +12,14 @@ code_extraction:
   exclude_dirs: [".git", ".github", "node_modules", ".next", "dist", "build", "public", "docs"]
   exclude_files: ["package-lock.json", "go.sum"]
   openapi_spec: api/openapi.yaml   # source for API route fields
+  # Any file with one of these names is also read as an OpenAPI spec (for uploaded repos)
+  openapi_filenames: [openapi.yaml, openapi.yml, swagger.yaml, swagger.yml]
+
+upload:                     # limits for files uploaded on the website
+  max_bpmn_mb: 5
+  max_zip_mb: 50            # compressed size of a source-code ZIP
+  max_unzipped_mb: 200      # total size after extraction (zip-bomb guard)
+  max_files: 20000
 
 preprocessing:
   split_identifiers: true   # camelCase / snake_case

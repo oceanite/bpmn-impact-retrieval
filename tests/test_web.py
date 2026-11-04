@@ -54,6 +54,27 @@ def test_evaluation_page(level):
     assert r.status_code == 200 and "bm25" in r.text and "tfidf" in r.text and "S06" in r.text
 
 
+def test_mapping_with_source_code_zip():
+    from test_archive import zip_fixture_repo
+    r = client.post("/", data={"method": "bm25"},
+                    files={"old_file": ("old.bpmn", OLD), "new_file": ("new.bpmn", NEW),
+                           "code_zip": ("shop.zip", zip_fixture_repo())})
+    assert r.status_code == 200 and "shop.zip" in r.text and "ConfirmOrder" in r.text
+
+
+def test_scenario_against_uploaded_zip():
+    from test_archive import zip_fixture_repo
+    r = client.post("/", data={"scenario": "S03", "method": "bm25"},
+                    files={"code_zip": ("shop.zip", zip_fixture_repo())})
+    assert r.status_code == 200 and "shop.zip" in r.text
+
+
+def test_bad_zip_shows_error():
+    r = client.post("/", data={"scenario": "S01", "method": "bm25"},
+                    files={"code_zip": ("code.zip", b"not a zip")})
+    assert r.status_code == 200 and "not a valid ZIP" in r.text
+
+
 def test_api():
     r = client.get("/api/scenarios/S01?k=3")
     assert r.status_code == 200 and len(r.json()["results"]) == 3

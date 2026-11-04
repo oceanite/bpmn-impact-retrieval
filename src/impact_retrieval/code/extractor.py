@@ -81,10 +81,12 @@ def extract_corpus(repo_root: str | Path, cfg: Mapping) -> list[CodeDocument]:
     exclude_files = set(cfg.get("exclude_files", []))
     openapi = cfg.get("openapi_spec")
 
+    openapi_names = {n.lower() for n in cfg.get("openapi_filenames", [])}
     units: list[_Unit] = []
     for file in _walk(root, include, exclude_dirs, exclude_files):
         rel = file.relative_to(root).as_posix()
-        units.extend(extract_file(rel, file.read_bytes(), is_openapi=(rel == openapi)))
+        is_openapi = rel == openapi or file.name.lower() in openapi_names
+        units.extend(extract_file(rel, file.read_bytes(), is_openapi=is_openapi))
 
     _attach_go_routes(units)
     return _freeze_all(units)

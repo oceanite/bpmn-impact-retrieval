@@ -32,7 +32,8 @@ call it and never re-implement a stage.
 | `retrieval/tfidf.py` | same | Baseline: scikit-learn TF-IDF (sublinear tf) + cosine, same analyzer, no field weights. |
 | `evaluation/metrics.py` | ranking + ground truth → metrics | P@k, R@k, F1@k, FPR@k, MRR at **file** and **function** level, TP/FP/FN lists. |
 | `evaluation/runner.py` | pipeline + scenarios → results | Used by the website and `experiments/run_eval.py`. |
-| `pipeline.py` | old/new BPMN → `ImpactReport` | Caches corpus and indexes per config. CLI: `python -m impact_retrieval.pipeline S01`. |
+| `code/archive.py` | uploaded ZIP → folder | Safe extraction: rejects `../`, absolute/drive/UNC paths and symlinks; file-count and unzipped-size limits (`config.upload`). Unwraps a single top-level folder (GitHub "Download ZIP"). Code is parsed, never executed. |
+| `pipeline.py` | old/new BPMN → `ImpactReport` | Caches corpora and indexes (LRU, 8 entries) keyed by a content fingerprint, so different codebases never share an index. `ImpactPipeline.from_zip(bytes)` targets an uploaded codebase. CLI: `python -m impact_retrieval.pipeline S01`. |
 | `web/app.py` | HTTP | FastAPI + Jinja templates. Mapping, Evaluation, JSON API. |
 
 ### Document fields
