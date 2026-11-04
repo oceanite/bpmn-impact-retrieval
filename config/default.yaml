@@ -12,14 +12,34 @@ code_extraction:
   exclude_dirs: [".git", ".github", "node_modules", ".next", "dist", "build", "public", "docs"]
   exclude_files: ["package-lock.json", "go.sum"]
   openapi_spec: api/openapi.yaml   # source for API route fields
-  unit: function   # function | file
 
 preprocessing:
   split_identifiers: true   # camelCase / snake_case
   lowercase: true
-  remove_stopwords: true
+  remove_stopwords: true    # English list (scikit-learn) + the lists below
   stemming: porter          # porter | none
   min_token_length: 2
+  # Words that appear in almost every source file and carry no business meaning
+  code_stopwords: [func, return, err, nil, ctx, context, string, int, bool, error, var, const,
+                   type, struct, interface, package, import, if, else, for, range, defer, go,
+                   tx, "true", "false", "null", undefined, async, await, export, default, let,
+                   new, http, json, api, internal, adapter, backend, frontend, src, ts, tsx,
+                   app, features, lib, fmt, errors, len, make, append, map, chi, pgx,
+                   use, div, span, props]
+  # Words that appear in almost every BPMN model
+  bpmn_stopwords: [task, process, start, end, event, gateway, flow, lane, level, completed,
+                   requested, identified, ready, merge]
+
+query:
+  drop_ids: true            # remove BPMN trace ids like SAL-SO-001 from query text
+  weights:                  # weight of each query part role (see query/builder.py)
+    name: 1.0
+    name_old: 1.0
+    documentation: 0.5
+    flow: 0.3
+    flow_endpoint: 0.3
+    lane: 0.2
+    process: 0.1
 
 retrieval:
   method: bm25              # bm25 | keyword | tfidf
@@ -27,7 +47,9 @@ retrieval:
   bm25:
     k1: 1.5
     b: 0.75
-  # Multiplier applied per document field when building the index
+  tfidf:
+    sublinear_tf: true
+  # Multiplier applied per document field (BM25 only)
   field_weights:
     path: 2.0
     name: 3.0
@@ -35,7 +57,7 @@ retrieval:
     db_table: 2.0
     comment: 1.0
     config: 1.0
-    test: 0.5
+    test: 2.0
     body: 1.0
 
 evaluation:

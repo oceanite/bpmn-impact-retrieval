@@ -45,7 +45,8 @@ class Analyzer:
         if cfg.get("remove_stopwords", True):
             stop |= set(ENGLISH_STOP_WORDS)
             for key in ("code_stopwords", "bpmn_stopwords", "extra_stopwords"):
-                stop |= {w.lower() for w in cfg.get(key) or ()}
+                # str(): unquoted YAML words like true/false/null arrive as bool/None
+                stop |= {str(w).lower() for w in cfg.get(key) or () if w is not None}
         self.stopwords = frozenset(stop)
 
     def tokens(self, text: str | None) -> list[str]:
