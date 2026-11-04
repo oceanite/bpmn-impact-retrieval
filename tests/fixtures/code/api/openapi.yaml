@@ -1,0 +1,13 @@
+openapi: 3.1.0
+info: {title: Shop API, version: 1.0.0}
+paths:
+  /orders/{id}/confirm:
+    post:
+      summary: Confirm an approved order to the customer
+      operationId: confirm-order
+  /deliveries:
+    get:
+      summary: List deliveries
+components:
+  schemas:
+    Order: {type: object, properties: {confirmed: {type: boolean}}}
