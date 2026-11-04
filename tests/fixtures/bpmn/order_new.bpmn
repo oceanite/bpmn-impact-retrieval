@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Changes vs order_old.bpmn:
+     T1 renamed + documentation changed; T2 removed (with MF1, F5); T4 added (with F7);
+     F3 retargeted T2 -> T4; F4 condition changed; T3 serviceTask -> userTask and moved to L_CLERK;
+     shape S_di moved (layout only, must not be reported). -->
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  id="Defs" targetNamespace="https://example.test/bpmn">
+  <bpmn:collaboration id="C1">
+    <bpmn:participant id="P1" name="Shop" processRef="PROC" />
+    <bpmn:participant id="P2" name="Customer" />
+  </bpmn:collaboration>
+  <bpmn:process id="PROC" name="Order handling" isExecutable="false">
+    <bpmn:laneSet id="LS1">
+      <bpmn:lane id="L_CLERK" name="Clerk">
+        <bpmn:flowNodeRef>S</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GW</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T4</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="L_SYS" name="System">
+        <bpmn:flowNodeRef>E</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="S" name="Order received">
+      <bpmn:outgoing>F1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="S_MED" />
+    </bpmn:startEvent>
+    <bpmn:userTask id="T1" name="Create sales order">
+      <bpmn:documentation>Clerk enters customer and order lines.</bpmn:documentation>
+      <bpmn:incoming>F1</bpmn:incoming>
+      <bpmn:outgoing>F2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="GW" name="Stock available?" default="F3">
+      <bpmn:incoming>F2</bpmn:incoming>
+      <bpmn:outgoing>F3</bpmn:outgoing>
+      <bpmn:outgoing>F4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="T3" name="Reserve stock">
+      <bpmn:incoming>F4</bpmn:incoming>
+      <bpmn:outgoing>F6</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="T4" name="Approve order">
+      <bpmn:incoming>F3</bpmn:incoming>
+      <bpmn:outgoing>F7</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="E" name="Done">
+      <bpmn:incoming>F6</bpmn:incoming>
+      <bpmn:incoming>F7</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F1" sourceRef="S" targetRef="T1" />
+    <bpmn:sequenceFlow id="F2" sourceRef="T1" targetRef="GW" />
+    <bpmn:sequenceFlow id="F3" name="Yes" sourceRef="GW" targetRef="T4" />
+    <bpmn:sequenceFlow id="F4" name="No stock" sourceRef="GW" targetRef="T3">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${stock &lt;= 0}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F6" sourceRef="T3" targetRef="E" />
+    <bpmn:sequenceFlow id="F7" sourceRef="T4" targetRef="E" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="D1">
+    <bpmndi:BPMNPlane id="PL1" bpmnElement="C1">
+      <bpmndi:BPMNShape id="S_di" bpmnElement="S"><dc:Bounds x="60" y="140" width="36" height="36" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T1_di" bpmnElement="T1"><dc:Bounds x="180" y="80" width="100" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="F1_di" bpmnElement="F1"><di:waypoint x="96" y="158" /><di:waypoint x="180" y="118" /></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
