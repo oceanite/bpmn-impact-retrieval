@@ -51,6 +51,7 @@ Simple-ERP source
 python -m venv .venv
 # Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
+pip install -e .          # makes `impact_retrieval` importable (CLI, experiments, web)
 
 # Target codebase (not committed)
 git clone https://github.com/AbimanyuDA/Simple-ERP.git data/target_repo
@@ -69,11 +70,22 @@ Simple-ERP layout (what gets indexed):
 
 ## Usage
 
-> Not implemented yet. Planned entry points:
->
-> - `python -m impact_retrieval.pipeline --scenario <ID> --method bm25` — impact report for one scenario
-> - `uvicorn web.app:app --reload` — website
-> - `pytest` — tests
+```bash
+pytest                                                   # all tests
+uvicorn web.app:app --reload                             # website → http://127.0.0.1:8000
+
+python -m impact_retrieval.pipeline S03                  # impact report for a scenario (BM25)
+python -m impact_retrieval.pipeline S03 --method keyword -k 20
+python -m impact_retrieval.pipeline old.bpmn new.bpmn --json
+
+python experiments/run_eval.py                           # BM25 vs keyword vs TF-IDF on all scenarios
+python experiments/build_scenarios.py                    # regenerate data/bpmn/scenarios
+```
+
+First results (default config, S01–S06, file level): BM25 F1@5 = 0.648, R@10 = 0.944, MRR = 1.00,
+compared with keyword 0.465 / 0.692 / 0.78 and TF-IDF 0.560 / 0.861 / 1.00.
+Details and threats to validity: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Team task list: [`docs/TASKS.md`](docs/TASKS.md).
 
 ## Website (final deliverable)
 
