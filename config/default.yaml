@@ -62,4 +62,5 @@ retrieval:
 
 evaluation:
   k_values: [1, 3, 5, 10]
-  match_level: file         # file | function
+  match_level: file         # file | function (default view on the website)
+  retrieve_depth: 100       # documents retrieved before collapsing to files
