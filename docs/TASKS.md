@@ -1,7 +1,7 @@
 # Pembagian tugas (Kelompok 9)
 
 Status per 2026-11-04: **seluruh pipeline sudah jalan dari ujung ke ujung**, termasuk website
-dan evaluasi, plus upload source code berbentuk ZIP (129 test lulus). Pekerjaan yang tersisa adalah *memperbaiki, menguji dan melaporkan*,
+dan evaluasi, plus upload source code berbentuk ZIP (135 test lulus). Pekerjaan yang tersisa adalah *memperbaiki, menguji dan melaporkan*,
 bukan membangun dari nol. Baca `docs/ARCHITECTURE.md` dulu.
 
 ## Cara mulai (semua anggota)
@@ -68,12 +68,12 @@ perbandingan sebelum/sesudah di PR.
 
 File: `data/`, `experiments/`, `src/impact_retrieval/evaluation/`.
 
-- [ ] **Review ke-41 baris ground truth** S01–S06 dengan membuka kodenya langsung. Aturannya ada di
-      `data/ground_truth/README.md`. Catat setiap baris yang diubah beserta alasannya di PR.
-- [ ] **Tambah skenario S07–S10** lewat `experiments/build_scenarios.py`. Jenis perubahan yang belum ada:
-      ubah kondisi gateway, tambah message flow, pindah lane saja, dan skenario multi-perubahan
-      (beberapa task sekaligus). Tiap skenario butuh `scenario.md`, baris ground truth, dan entri di
-      `EXPECTED_SCENARIOS` (`tests/test_bpmn_diff.py`).
+- [x] Review pertama ground truth S01–S06 (41 → 50 baris, alasan di `data/ground_truth/REVIEW_LOG.md`).
+- [x] Skenario S07–S10 (test set, 19 baris ground truth): kondisi gateway, message flow, pindah lane, multi-perubahan.
+- [ ] **Review kedua** ground truth S01–S06 dan S07–S10 oleh anggota tim, terutama baris *borderline*.
+      Isi tabel di `REVIEW_LOG.md`. Untuk S07–S10: review **tanpa** melihat hasil ranking.
+- [ ] Jangan evaluasi atau tuning pada test set sebelum M4. `run_eval.py` dan halaman Evaluation memakai
+      split `dev` secara default; `--split test` hanya untuk run final.
 - [ ] **Script tuning parameter** (`experiments/tune.py`): grid k1 ∈ {0.9, 1.2, 1.5, 2.0}, b ∈ {0.3, 0.5, 0.75, 1.0},
       plus beberapa variasi bobot field. Pakai **leave-one-scenario-out**: tuning di 5 skenario, uji di 1,
       ulangi 6 kali. Laporkan hasil di skenario uji, bukan di skenario tuning.

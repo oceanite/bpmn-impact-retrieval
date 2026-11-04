@@ -24,7 +24,11 @@ draft goods receipt before it is posted.
 - `purchasing/application/service.go` (file level): a new approve method on the service and store interface.
 - `goods-receipt-panel.tsx` `GoodsReceiptPanel`: Approve button before Post.
 - `api/openapi.yaml`: goods-receipt action enum `[post, cancel, reverse]`.
-- Tests that post DRAFT receipts directly: `TestP2PPartialReceiptPostsImmutableSourceLinkedLedger`, `TestPostingDraftReceiptCannotReviveCancelledOrder`.
+- Tests that post DRAFT receipts directly: `TestP2PPartialReceiptPostsImmutableSourceLinkedLedger`,
+  `TestSuperAdminCanSelfApproveP2P`, `TestP2PConsolidatedInvoiceExactMatchPartialPaymentCloseAndVoid`
+  (the last two added in the review).
+- `TestPostingDraftReceiptCannotReviveCancelledOrder` expects posting to fail; after the change it
+  fails for a different reason (not approved), so it must be edited to keep testing the cancellation guard.
 
 ## Notes
 

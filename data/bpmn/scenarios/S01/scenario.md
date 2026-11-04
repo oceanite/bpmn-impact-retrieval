@@ -21,9 +21,14 @@ wants unit-price differences inside a configured percentage to be accepted autom
 
 - `finance/domain/finance.go` `ExactMatch`: the zero-tolerance comparison becomes tolerance-based.
 - `finance/adapter/postgres/store.go` `MatchSupplierInvoice`: calls the match rule and decides `POSTED` vs `MATCH_EXCEPTION`.
-- Tests asserting zero tolerance: `TestPURINV002ExactMatchHasZeroTolerance`, `TestP2PConsolidatedInvoiceExactMatchPartialPaymentCloseAndVoid`.
+- `api/openapi.yaml`: "Record a consolidated supplier invoice for exact matching".
+- Test asserting zero price tolerance: `TestPURINV002ExactMatchHasZeroTolerance` (a price off by 0.01 must fail today).
 
 ## Notes
+
+- `TestP2PConsolidatedInvoiceExactMatchPartialPaymentCloseAndVoid` was removed in the review
+  (2026-11-04): its mismatch is a **quantity** difference (9 vs 10), which stays an exception
+  under a price-only tolerance, so the test keeps passing.
 
 - The code compares invoice lines with **purchase-order lines only**; it never reads goods
   receipts. The old BPMN label "three-way match" already overstates what the code does.

@@ -150,6 +150,32 @@ class Model:
         edge = ET.SubElement(self.plane(), BDI + "BPMNEdge", {"id": f"{flow_id}_di", "bpmnElement": flow_id})
         self._route(flow_id, edge)
 
+    def rename_flow(self, flow_id, name, condition=None):
+        """Change a sequence flow's label and (optionally) its condition expression."""
+        f = self.el(flow_id)
+        f.set("name", name)
+        if condition is not None:
+            cond = f.find(B + "conditionExpression")
+            if cond is None:
+                cond = ET.SubElement(f, B + "conditionExpression",
+                                     {f"{{{NS['xsi']}}}type": "bpmn:tFormalExpression"})
+            cond.text = condition
+
+    def add_message_flow(self, flow_id, src, tgt, name):
+        """Message flow between a task and a participant pool, drawn as a vertical line."""
+        collab = self.root.find(B + "collaboration")
+        last = max(i for i, c in enumerate(collab) if c.tag in (B + "participant", B + "messageFlow"))
+        collab.insert(last + 1, ET.Element(B + "messageFlow",
+                                           {"id": flow_id, "name": name, "sourceRef": src, "targetRef": tgt}))
+        s, t = self.bounds(src), self.bounds(tgt)
+        task, pool = (s, t) if s["height"] < t["height"] or s["width"] < t["width"] else (t, s)
+        x = int(task["x"] + task["width"] / 2)
+        top, bottom = int(pool["y"] + pool["height"]), int(task["y"])
+        ys = (bottom, top) if task is s else (top, bottom)
+        edge = ET.SubElement(self.plane(), BDI + "BPMNEdge", {"id": f"{flow_id}_di", "bpmnElement": flow_id})
+        for y in ys:
+            ET.SubElement(edge, DI + "waypoint", {"x": str(x), "y": str(y)})
+
     def add_node(self, tag, id_, name, lane, x, w=120, h=80):
         node = ET.Element(B + tag, {"id": id_, "name": name})
         self.process().append(node)
@@ -236,6 +262,41 @@ def s06(m):  # P2P: add an approval step between receiving and posting goods
     m.add_flow("FLOW-P2P-009A", "PUR-GR-003", "PUR-GR-002")
 
 
+# --- test set (frozen 2026-11-04; do not tune on these) ----------------------
+def s07(m):  # O2C: gateway condition - accept backorders instead of blocking on stock
+    m.rename("GW-O2C-STOCK", "Stock available or backorder accepted?")
+    m.document("GW-O2C-STOCK", "A sales order with insufficient stock may still be submitted and "
+               "approved when the customer accepts a backorder; the shortfall is delivered later "
+               "as a partial delivery.")
+    m.rename_flow("FLOW-O2C-004", "Available or backorder",
+                  "stockAvailable = true or backorderAccepted = true")
+
+
+def s08(m):  # P2P: new message flow - send an invoice dispute notice to the supplier
+    m.add_message_flow("MSG-P2P-005", "PUR-INV-003", "PART-P2P-SUPPLIER", "Invoice dispute notice")
+    m.document("PUR-INV-003", "Admin records the dispute reason together with the corrected invoice "
+               "lines; the reason is sent to the supplier as an invoice dispute notice.")
+
+
+def s09(m):  # P2P: lane change only - purchase orders are created by the admin, not the operator
+    m.move_lane("PUR-PO-001", "LANE-P2P-OPERATOR", "LANE-P2P-ADMIN")
+    for f in ("FLOW-P2P-005", "FLOW-P2P-007"):
+        m._route(f)
+
+
+def s10(m):  # O2C: multi-change - supervisor posts deliveries, invoices per delivery
+    m.retag("SAL-DLV-002", "userTask")
+    m.rename("SAL-DLV-002", "Approve and post delivery")
+    m.move_lane("SAL-DLV-002", "LANE-O2C-SYSTEM", "LANE-O2C-ADMIN")
+    m.document("SAL-DLV-002", "A supervisor checks the delivery and posts it to stock; the operator "
+               "who created the delivery cannot post it.")
+    for f in ("FLOW-O2C-011", "FLOW-O2C-012"):
+        m._route(f)
+    m.rename("SAL-INV-001", "Generate sales invoice per delivery")
+    m.document("SAL-INV-001", "Invoice the delivered quantity that is not invoiced yet after each "
+               "posted delivery, so partially delivered sales orders can be invoiced.")
+
+
 SCENARIOS = {
     "S01": ("l2-procure-to-pay.bpmn", s01),
     "S02": ("l2-inventory-adjustment.bpmn", s02),
@@ -243,6 +304,10 @@ SCENARIOS = {
     "S04": ("l2-access-lifecycle.bpmn", s04),
     "S05": ("l2-access-lifecycle.bpmn", s05),
     "S06": ("l2-procure-to-pay.bpmn", s06),
+    "S07": ("l2-order-to-cash.bpmn", s07),
+    "S08": ("l2-procure-to-pay.bpmn", s08),
+    "S09": ("l2-procure-to-pay.bpmn", s09),
+    "S10": ("l2-order-to-cash.bpmn", s10),
 }
 
 if __name__ == "__main__":

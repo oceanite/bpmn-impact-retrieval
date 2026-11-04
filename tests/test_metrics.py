@@ -63,5 +63,5 @@ def test_load_ground_truth(tmp_path):
 def test_real_ground_truth_file_loads():
     from conftest import REPO_ROOT
     gt = load_ground_truth(REPO_ROOT / "data" / "ground_truth" / "ground_truth.csv")
-    assert set(gt) == {"S01", "S02", "S03", "S04", "S05", "S06"}
-    assert sum(len(v) for v in gt.values()) == 41
+    assert set(gt) == {f"S{i:02d}" for i in range(1, 11)}
+    assert sum(len(v) for v in gt.values()) == 69

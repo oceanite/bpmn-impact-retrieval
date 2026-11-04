@@ -26,6 +26,9 @@ delays delivery. An approved order should be deliverable right away.
 - `sales/adapter/postgres/store.go` `GetOrder`: returns the `confirmed` flag.
 - `sales-order-panel.tsx` `SalesOrderPanel`: Confirm button.
 - `delivery-panel.tsx` `DeliveryPanel`: blocks delivery with "Sales order belum dikonfirmasi".
-- `operations/types.ts` `WorkflowDocumentDetail`: `confirmed` field.
+- `operations/types.ts` `WorkflowDocumentDetail` and `sales/application/service.go` `OrderDetail`: `confirmed` field.
 - `api/openapi.yaml`: `confirm` in the sales-order action enum, and the "confirmation state" summary.
 - Test: `TestDeliveryRequiresOrderConfirmation`.
+- Tests that call the `confirm` action before delivering or invoicing (fail once the action is gone):
+  `TestConcurrentDeliveriesCannotOversell`, `TestPostingDraftDeliveryCannotReviveCancelledOrder`,
+  `TestO2CConsolidatedInvoicePartialPaymentCompletionAndVoid` (added in the review).

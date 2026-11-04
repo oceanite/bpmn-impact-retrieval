@@ -111,14 +111,18 @@ async def _read_upload(upload: UploadFile | None, max_mb: int) -> bytes | None:
 
 @app.get("/evaluation", response_class=HTMLResponse)
 def evaluation(request: Request, k: int = 5, level: str = "file", k1: float | None = None,
-               b: float | None = None):
+               b: float | None = None, split: str | None = None):
     if level not in ("file", "function"):
         raise HTTPException(400, "level must be file or function")
     cfg = load_config(overrides=_overrides(k1, b, None, _weights_from(dict(request.query_params))))
     k_values = sorted({1, 3, 5, 10, k})
     cfg["evaluation"]["k_values"] = k_values
     pipe = ImpactPipeline(cfg=cfg)
-    results = evaluate_all(pipe, METHODS, k_values=k_values)
+    split = split or cfg["evaluation"].get("default_split", "all")
+    try:
+        results = evaluate_all(pipe, METHODS, k_values=k_values, split=split)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
     summary = [row for row in summarize(results, level) if row["k"] == k]
     per_scenario: dict[str, dict[str, Any]] = {}
     for r in results:
@@ -126,7 +130,8 @@ def evaluation(request: Request, k: int = 5, level: str = "file", k1: float | No
         per_scenario.setdefault(r.scenario_id, {})[r.method] = {"cut": ev.at(k), "mrr": ev.mrr,
                                                                 "latency": r.report.latency_ms}
     return templates.TemplateResponse(request, "evaluation.html", {
-        "k": k, "level": level, "methods": METHODS, "summary": summary, "per_scenario": per_scenario,
+        "k": k, "level": level, "split": split, "splits": ["all", *cfg["evaluation"].get("splits", {})],
+        "methods": METHODS, "summary": summary, "per_scenario": per_scenario,
         "settings": _settings_context(cfg), "fields": FIELDS})
 
 
@@ -143,6 +148,9 @@ def api_scenario(scenario_id: str, method: str = "bm25", k: int = 10):
 
 
 @app.get("/api/evaluation")
-def api_evaluation(level: str = "file"):
+def api_evaluation(level: str = "file", split: str | None = None):
     pipe = ImpactPipeline(cfg=DEFAULTS)
-    return summarize(evaluate_all(pipe, METHODS), level)
+    try:
+        return summarize(evaluate_all(pipe, METHODS, split=split), level)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc

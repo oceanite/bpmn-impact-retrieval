@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+from impact_retrieval.evaluation import split_scenarios
 from impact_retrieval.pipeline import ImpactPipeline, main
 from impact_retrieval.retrieval import METHODS
 
@@ -53,8 +54,23 @@ def test_errors(pipe, bpmn_fixture):
         pipe.run_scenario("S99")
 
 
+DEV = ["S01", "S02", "S03", "S04", "S05", "S06"]
+TEST = ["S07", "S08", "S09", "S10"]
+
+
 def test_real_scenarios_are_listed():
-    assert ImpactPipeline().scenarios() == ["S01", "S02", "S03", "S04", "S05", "S06"]
+    assert ImpactPipeline().scenarios() == DEV + TEST
+
+
+def test_dev_and_test_splits():
+    pipe = ImpactPipeline()
+    assert split_scenarios(pipe) == DEV                    # default_split: dev keeps the test set out
+    assert split_scenarios(pipe, "dev") == DEV
+    assert split_scenarios(pipe, "test") == TEST
+    assert split_scenarios(pipe, "all") == DEV + TEST
+    assert not set(split_scenarios(pipe, "dev")) & set(split_scenarios(pipe, "test"))
+    with pytest.raises(ValueError, match="unknown split"):
+        split_scenarios(pipe, "train")
 
 
 def test_cli_with_two_files(bpmn_fixture, capsys, monkeypatch, cfg):

@@ -13,6 +13,11 @@
           <option value="function" {% if level == 'function' %}selected{% endif %}>function</option>
         </select>
       </label>
+      <label>Scenarios
+        <select name="split">
+          {% for s in splits %}<option value="{{ s }}" {% if s == split %}selected{% endif %}>{{ s }}</option>{% endfor %}
+        </select>
+      </label>
       <button type="submit">Evaluate</button>
     </div>
     {% with show_top_k=False %}{% include "_settings.html" %}{% endwith %}
@@ -20,7 +25,8 @@
 </section>
 
 <section>
-  <h2>Mean over {{ per_scenario|length }} scenarios at k = {{ k }} ({{ level }} level)</h2>
+  <h2>Mean over {{ per_scenario|length }} scenarios ({{ split }}) at k = {{ k }} ({{ level }} level)</h2>
+  {% if split != 'dev' %}<p class="error">The test set (S07–S10) is frozen: look at it only for the final evaluation, never while tuning.</p>{% endif %}
   {% set best_f1 = summary|map(attribute='f1')|max %}
   <div class="table-wrap"><table>
     <tr><th>Method</th><th>P@k</th><th>R@k</th><th>F1@k</th><th>MRR</th><th>FPR@k</th><th>Latency (ms)</th></tr>

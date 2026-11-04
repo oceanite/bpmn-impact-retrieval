@@ -16,7 +16,12 @@ A row is included only if, given the BPMN change, that code **must be edited**:
 2. The HTTP handler or route registration, if the API surface changes.
 3. The frontend component that triggers or displays the changed step.
 4. `api/openapi.yaml`, if a route, action enum, or response description changes.
-5. Existing tests that assert the old behaviour (they would fail after the change).
+5. Existing tests that assert the old behaviour (they would fail after the change), including
+   tests that only fail because their setup calls a removed or changed step (e.g. the `confirm`
+   action in S03, posting a DRAFT receipt in S06).
+6. Existing tests that would still pass but only **vacuously**: they assert that something is
+   rejected, and after the change it is rejected for a different reason, so they must be edited
+   to keep testing what their name says (e.g. `TestPostingDraftReceiptCannotReviveCancelledOrder` in S06).
 
 Excluded on purpose:
 
@@ -26,4 +31,15 @@ Excluded on purpose:
   because they are not in the corpus yet. Each `scenario.md` notes them.
 - `docs/` in Simple-ERP. It is not indexed (see `config/default.yaml`).
 
-Verified against Simple-ERP commit `c76a313`.
+## Splits
+
+| Split | Scenarios | Rows | Use |
+|---|---|---|---|
+| dev | S01–S06 | 50 | experiments, tuning (leave-one-scenario-out) |
+| test | S07–S10 | 19 | **frozen 2026-11-04**; evaluated once, with the final config (M4) |
+
+The split is defined in `config/default.yaml` (`evaluation.splits`). After the freeze, S07–S10
+and their rows must not change; if a real error is found, fix it in a commit that says so and
+report it in the final results.
+
+Verified against Simple-ERP commit `c76a313`. Changes and reasons: [`REVIEW_LOG.md`](REVIEW_LOG.md).

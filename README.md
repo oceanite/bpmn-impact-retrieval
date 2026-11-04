@@ -30,7 +30,7 @@ Simple-ERP source
 |---|---|
 | `config/default.yaml` | All tunable parameters (k1, b, top-k, field weights, …) |
 | `data/target_repo/` | Simple-ERP clone — **gitignored, never commit** |
-| `data/bpmn/scenarios/<ID>/` | `old.bpmn`, `new.bpmn`, `scenario.md` per change scenario |
+| `data/bpmn/scenarios/<ID>/` | `old.bpmn`, `new.bpmn`, `scenario.md` per change scenario (S01–S06 dev, S07–S10 test) |
 | `data/ground_truth/ground_truth.csv` | Answer key: `scenario_id,file_path,function` |
 | `data/bpmn/real/` | A real old/new BPMN pair from Simple-ERP's history (demo upload, no ground truth) |
 | `src/impact_retrieval/bpmn/` | BPMN parsing and diff |
@@ -79,12 +79,15 @@ python -m impact_retrieval.pipeline S03                  # impact report for a s
 python -m impact_retrieval.pipeline S03 --method keyword -k 20
 python -m impact_retrieval.pipeline old.bpmn new.bpmn --json
 
-python experiments/run_eval.py                           # BM25 vs keyword vs TF-IDF on all scenarios
+python experiments/run_eval.py                           # BM25 vs keyword vs TF-IDF on the dev set
+python experiments/run_eval.py --split test              # frozen test set: final run only
 python experiments/build_scenarios.py                    # regenerate data/bpmn/scenarios
 ```
 
-First results (default config, S01–S06, file level): BM25 F1@5 = 0.648, R@10 = 0.944, MRR = 1.00,
-compared with keyword 0.465 / 0.692 / 0.78 and TF-IDF 0.560 / 0.861 / 1.00.
+First results (default config, dev set S01–S06, file level): BM25 F1@5 = 0.657, R@10 = 0.932, MRR = 1.00,
+compared with keyword 0.476 / 0.711 / 0.76 and TF-IDF 0.606 / 0.845 / 1.00.
+S07–S10 are the frozen test set; `run_eval.py` and the Evaluation page use the dev set unless
+you choose `--split test` / `all`.
 Details and threats to validity: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 Team task list: [`docs/TASKS.md`](docs/TASKS.md).
 

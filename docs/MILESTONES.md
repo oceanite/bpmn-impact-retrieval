@@ -4,8 +4,14 @@
 Kalau deadline resmi dari dosen berbeda, geser semua tanggal dengan selisih yang sama. Urutan milestone jangan diubah.
 
 **Titik awal (4 November 2026):** seluruh pipeline sudah berjalan dari BPMN sampai ranking file/fungsi, termasuk
-website dan evaluasi. Website juga bisa menerima source code lain dalam bentuk ZIP. Ada 6 skenario, 41 baris
-ground truth, 1 pasangan BPMN asli dari riwayat Simple-ERP (`data/bpmn/real/`, untuk demo), dan 129 test yang lulus.
+website dan evaluasi. Website juga bisa menerima source code lain dalam bentuk ZIP. Ada 10 skenario (S01–S06 dev
+set, S07–S10 test set yang sudah dibekukan), 69 baris ground truth (review pertama S01–S06 sudah selesai, lihat
+`data/ground_truth/REVIEW_LOG.md`), 1 pasangan BPMN asli dari riwayat Simple-ERP (`data/bpmn/real/`, untuk demo),
+dan 135 test yang lulus.
+
+> **Sudah dikerjakan lebih awal (4 November):** review pertama ground truth (M1) dan pembuatan test set S07–S10
+> beserta ground truth-nya (M2). Tugas Orang 3 di M1 dan M2 berubah menjadi **review kedua**: memeriksa ulang
+> pekerjaan itu, bukan membuatnya dari awal. Waktu yang tersisa dipakai lebih awal untuk `tune.py` (M3).
 Lima minggu ini dipakai untuk
 **memvalidasi, memperbaiki, mengevaluasi dengan jujur, dan melaporkan**, bukan untuk membangun dari nol.
 Detail teknis ada di [`ARCHITECTURE.md`](ARCHITECTURE.md), dan daftar tugas per modul di [`TASKS.md`](TASKS.md).
@@ -84,13 +90,13 @@ gantt
 
 | Peran | Tugas | Estimasi |
 |---|---|---|
-| Semua | Clone repo, buat venv, `pip install -r requirements.txt` dan `pip install -e .`, clone Simple-ERP ke `data/target_repo`, lalu `pytest` (129 lulus) | 1–2 jam |
+| Semua | Clone repo, buat venv, `pip install -r requirements.txt` dan `pip install -e .`, clone Simple-ERP ke `data/target_repo`, lalu `pytest` (135 lulus) | 1–2 jam |
 | Semua | Jalankan `python -m impact_retrieval.pipeline S03`, buka website (`uvicorn web.app:app --reload`), coba halaman Mapping dan Evaluation, termasuk upload pasangan `data/bpmn/real/` dan upload ZIP | 1 jam |
 | Lead | **Sesi walkthrough (1–2 jam):** jelaskan diagram di `ARCHITECTURE.md`, telusuri satu skenario dari BPMN sampai ranking, tunjukkan di mana setiap modul berada | 3 jam (dengan persiapan) |
 | Lead | Buat GitHub Project board dan Issue dari `TASKS.md`, atur branch protection `main` (wajib PR) | 1 jam |
 | Semua | Baca modul yang akan dipegang sendiri beserta test-nya | 2 jam |
 
-**Deliverable:** setiap anggota memposting screenshot `129 passed` dan halaman website di grup.
+**Deliverable:** setiap anggota memposting screenshot `135 passed` dan halaman website di grup.
 Semua Issue M1 sudah dibuat dan di-assign.
 
 **Kriteria selesai:**
@@ -112,7 +118,7 @@ S01–S06 benar. Semua perbaikan nanti diukur terhadap baseline ini.
 
 | Peran | Tugas | Estimasi |
 |---|---|---|
-| **Orang 3** | Review **41 baris ground truth** S01–S06: buka setiap file dan fungsi di Simple-ERP, cocokkan dengan aturan di `data/ground_truth/README.md`. Catat setiap baris yang ditambah, dihapus atau dipertahankan beserta alasannya. | 6 jam |
+| **Orang 3** | **Review kedua** ground truth S01–S06 (50 baris; review pertama sudah selesai dan tercatat di `data/ground_truth/REVIEW_LOG.md`): buka setiap file dan fungsi di Simple-ERP, cocokkan dengan aturan di `data/ground_truth/README.md`. Fokus ke baris yang ditandai *borderline*. Catat setuju/tidak setuju di tabel log. | 4 jam |
 | **Orang 3** | Bersama Lead: putuskan kasus yang masih ragu, misalnya `platform/config/config.go` di S05 | 1 jam |
 | **Orang 2** | Script `experiments/term_stats.py`: tampilkan 50 term dengan document frequency tertinggi di korpus, dan term query yang tidak pernah muncul di korpus. Hasilnya jadi bahan audit stopwords. | 4 jam |
 | **Orang 2** | Usulkan perubahan `code_stopwords` dan `bpmn_stopwords`, plus daftar **stopwords bahasa Indonesia** (`dan`, `atau`, `yang`, ...; temuan dari `data/bpmn/real/`). Belum di-merge, hanya daftar beserta alasannya. | 2 jam |
@@ -143,9 +149,8 @@ S01–S06 benar. Semua perbaikan nanti diukur terhadap baseline ini.
 
 | Peran | Tugas | Estimasi |
 |---|---|---|
-| **Orang 3** | Buat **S07–S10** di `experiments/build_scenarios.py` dengan jenis perubahan yang belum ada: (1) ubah kondisi atau nama gateway, (2) tambah message flow ke pihak luar, (3) pindah lane saja, (4) **multi-perubahan**, yaitu 2–3 task di satu proses. Gunakan model `docs/bpmn` yang belum terpakai, misalnya `l1-core-processes.bpmn`. | 6 jam |
-| **Orang 3 + Lead** | Tulis ground truth S07–S10 dengan aturan yang sama. **Satu orang menulis, satu orang mereview.** | 3 jam |
-| **Orang 3** | Tambah entri S07–S10 di `EXPECTED_SCENARIOS` (`tests/test_bpmn_diff.py`), lalu **bekukan test set**: tidak ada lagi perubahan pada S07–S10 dan ground truth-nya setelah Jumat | 1 jam |
+| ~~Orang 3~~ | ~~Buat S07–S10~~ **Selesai 4 Nov:** S07 kondisi gateway (backorder), S08 message flow baru ke supplier, S09 pindah lane saja, S10 multi-perubahan (2 task). Sudah ada `scenario.md`, 19 baris ground truth, entri `EXPECTED_SCENARIOS`, dan split `test` di config. | — |
+| **Orang 3** | **Review ground truth S07–S10** (19 baris) dengan membaca `scenario.md` dan kodenya, **tanpa** melihat hasil ranking. Kesalahan nyata boleh diperbaiki sampai Jumat ini; setelah itu test set dibekukan permanen. | 3 jam |
 | **Orang 2** | Terapkan stopwords hasil audit, lalu ukur dampaknya di **dev set saja** (S01–S06) | 3 jam |
 | **Orang 2** | Kamus sinonim domain (opsional di config, default mati), dengan test | 4 jam |
 | **Orang 2** | Stopwords Indonesia dan kamus Indonesia → Inggris untuk model `docs/bpm-haqi` (opsional di config), dengan test. Cek hasilnya pada pasangan `data/bpmn/real/`. | 3 jam |
@@ -294,6 +299,7 @@ Isi setiap Jumat saat checkpoint, dengan angka rata-rata di level file dan k = 5
 | Tanggal | Versi / tag | Skenario | BM25 F1@5 | BM25 MRR | Keyword F1@5 | TF-IDF F1@5 | Catatan |
 |---|---|---|---|---|---|---|---|
 | 2026-11-04 | `e219ff2` | S01–S06 | 0.648 | 1.000 | 0.465 | 0.560 | Titik awal, config default, ground truth belum direview |
+| 2026-11-04 | (commit ini) | S01–S06 (dev) | 0.657 | 1.000 | 0.476 | 0.606 | Setelah review pertama ground truth (41 → 50 baris). Test set belum dievaluasi. |
 | 2026-11-13 | `v0.1-baseline` | S01–S06 | | | | | Setelah review ground truth |
 | 2026-11-20 | — | S01–S06 | | | | | Setelah stopwords dan sinonim |
 | 2026-11-27 | `v0.2-tuned` | S01–S06 (LOO) | | | | | Konfigurasi final |

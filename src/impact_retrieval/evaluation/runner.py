@@ -36,9 +36,22 @@ def evaluate_scenario(pipe: ImpactPipeline, scenario_id: str, method: str,
         evaluate_ranking(ranked, truth, universe, k_values, "function"))
 
 
+def split_scenarios(pipe: ImpactPipeline, split: str | None = None) -> list[str]:
+    """Scenario ids of a split from `evaluation.splits` (`all` = every scenario folder)."""
+    ev_cfg = pipe.cfg.get("evaluation", {})
+    split = split or ev_cfg.get("default_split", "all")
+    available = pipe.scenarios()
+    if split == "all":
+        return available
+    splits = ev_cfg.get("splits") or {}
+    if split not in splits:
+        raise ValueError(f"unknown split {split!r}; choose all or one of {sorted(splits)}")
+    return [s for s in splits[split] if s in available]
+
+
 def evaluate_all(pipe: ImpactPipeline, methods: Sequence[str], scenario_ids: Sequence[str] | None = None,
-                 k_values: Sequence[int] | None = None) -> list[ScenarioResult]:
-    ids = list(scenario_ids or pipe.scenarios())
+                 k_values: Sequence[int] | None = None, split: str | None = None) -> list[ScenarioResult]:
+    ids = list(scenario_ids or split_scenarios(pipe, split))
     return [evaluate_scenario(pipe, s, m, k_values) for m in methods for s in ids]
 
 

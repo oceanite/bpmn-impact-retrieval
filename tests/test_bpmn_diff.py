@@ -123,6 +123,22 @@ EXPECTED_SCENARIOS = {
         "FLOW-P2P-009A": (A, ()), "PUR-GR-003": (A, ()),
         "FLOW-P2P-009": (M, ("target",)),
     },
+    # test set (frozen)
+    "S07": {
+        "FLOW-O2C-004": (M, ("name", "condition")),
+        "GW-O2C-STOCK": (M, ("name", "documentation")),
+    },
+    "S08": {
+        "MSG-P2P-005": (A, ()),
+        "PUR-INV-003": (M, ("documentation",)),
+    },
+    "S09": {
+        "PUR-PO-001": (M, ("lane",)),
+    },
+    "S10": {
+        "SAL-DLV-002": (M, ("type", "name", "documentation", "lane")),
+        "SAL-INV-001": (M, ("name", "documentation")),
+    },
 }
 
 

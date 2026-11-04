@@ -28,6 +28,7 @@ submitted adjustments should go straight to posting.
 - `inventory/adapter/http/handler.go` `action`: role check for `approve`/`reject`.
 - `inventory-adjustment-panel.tsx` `InventoryAdjustmentPanel`: Approve/Reject buttons.
 - `api/openapi.yaml`: action enum `[submit, approve, reject, cancel, post, reverse]`.
+- `reporting/adapter/postgres/store.go` `Summary`: counts `SUBMITTED` adjustments as pending approvals on the dashboard (added in the review).
 - Tests: `TestINVADJ002And003MakerChecker`, `TestInventoryApprovalRejectsChangedSnapshot`, `TestApprovedInventoryAdjustmentCanRecoverFromStaleSnapshot`.
 
 ## Notes

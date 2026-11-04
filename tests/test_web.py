@@ -54,6 +54,12 @@ def test_evaluation_page(level):
     assert r.status_code == 200 and "bm25" in r.text and "tfidf" in r.text and "S06" in r.text
 
 
+def test_evaluation_defaults_to_dev_split():
+    r = client.get("/evaluation?k=5")
+    assert r.status_code == 200 and "(dev)" in r.text and "S06" in r.text and "S07" not in r.text
+    assert client.get("/evaluation?split=train").status_code == 400
+
+
 def test_mapping_with_source_code_zip():
     from test_archive import zip_fixture_repo
     r = client.post("/", data={"method": "bm25"},

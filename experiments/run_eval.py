@@ -1,8 +1,9 @@
 """Evaluate every method on every scenario and print BM25 vs baselines.
 
 Usage (from the repo root):
-    python experiments/run_eval.py                 # all scenarios, all methods
+    python experiments/run_eval.py                 # dev set (S01-S06), all methods
     python experiments/run_eval.py --level function --methods bm25 keyword
+    python experiments/run_eval.py --split test    # frozen test set: only for the final run (M4)
 
 Writes per-scenario rows to experiments/results/metrics.csv (gitignored).
 """
@@ -24,12 +25,13 @@ from impact_retrieval.retrieval import METHODS  # noqa: E402
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--methods", nargs="+", default=list(METHODS), choices=METHODS)
-    ap.add_argument("--scenarios", nargs="+")
+    ap.add_argument("--scenarios", nargs="+", help="explicit scenario ids (overrides --split)")
+    ap.add_argument("--split", help="dev | test | all (default: evaluation.default_split)")
     ap.add_argument("--level", choices=["file", "function", "both"], default="both")
     args = ap.parse_args()
 
     pipe = ImpactPipeline()
-    results = evaluate_all(pipe, args.methods, args.scenarios)
+    results = evaluate_all(pipe, args.methods, args.scenarios, split=args.split)
 
     out = ROOT / "experiments" / "results"
     out.mkdir(parents=True, exist_ok=True)

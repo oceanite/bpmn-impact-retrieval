@@ -20,6 +20,8 @@ error-prone. The system should email the link and mark the invitation as shared 
 - `auth/application/lifecycle.go` `Invite`: sends the email instead of returning the raw token to the admin.
 - `auth/application/lifecycle.go` `MarkShared`, `auth/adapter/postgres/lifecycle.go` `MarkTokenShared`: called by the system after sending, not by the admin.
 - `auth/adapter/http/lifecycle.go` `invite`, `shared`: response no longer exposes the token; the manual mark-shared endpoint changes.
+- `auth/adapter/http/lifecycle.go` `AdminRoutes`: registers `/user-invitations/{id}/mark-shared` (added in the review).
+- `api/openapi.yaml`: `/user-invitations` 201 response "One-time invitation token" (added in the review).
 - `platform/config/config.go` `Config`, `Load`: mail server settings.
 - `users-panel.tsx` `UsersPanel`: shows "Token undangan (tampil sekali)" today.
 - Test: `TestAUTHUSR001InviteReturnsRawTokenOnce`.
@@ -28,4 +30,4 @@ error-prone. The system should email the link and mark the invitation as shared 
 
 - Tests the **lane / task-type** change type, not just renames.
 - A new mail-sender adapter would be a new file and is not in the answer key.
-- The `mark-shared` route is not in `api/openapi.yaml`, so OpenAPI is not included.
+- The `mark-shared` route itself is not in `api/openapi.yaml`, but the invite response is, so OpenAPI is included.
