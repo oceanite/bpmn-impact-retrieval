@@ -6,8 +6,12 @@ paths:
   ground_truth: data/ground_truth/ground_truth.csv
 
 code_extraction:
-  include_extensions: [".py", ".js", ".ts", ".java", ".php", ".sql", ".yaml", ".yml", ".json"]
-  exclude_dirs: [".git", "node_modules", "vendor", "dist", "build", "__pycache__"]
+  # Simple-ERP: Go backend, Next.js/TypeScript frontend, SQL migrations, OpenAPI spec
+  include_extensions: [".go", ".ts", ".tsx", ".sql", ".yaml", ".yml", ".json"]
+  # docs/ holds Simple-ERP's own BPMN models — indexing them would leak the query into the corpus
+  exclude_dirs: [".git", ".github", "node_modules", ".next", "dist", "build", "public", "docs"]
+  exclude_files: ["package-lock.json", "go.sum"]
+  openapi_spec: api/openapi.yaml   # source for API route fields
   unit: function   # function | file
 
 preprocessing:

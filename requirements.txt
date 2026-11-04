@@ -8,9 +8,10 @@ scikit-learn>=1.4
 # Preprocessing (stopwords, Porter stemmer)
 nltk>=3.8
 
-# Code extraction (add the grammar package for Simple-ERP's language once known,
-# e.g. tree-sitter-python / tree-sitter-javascript / tree-sitter-php)
+# Code extraction (Simple-ERP: Go backend, TypeScript/TSX frontend)
 tree-sitter>=0.23
+tree-sitter-go>=0.23
+tree-sitter-typescript>=0.23
 
 # Data / config
 pandas>=2.1

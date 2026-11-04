@@ -53,8 +53,19 @@ python -m venv .venv
 pip install -r requirements.txt
 
 # Target codebase (not committed)
-git clone <simple-erp-url> data/target_repo
+git clone https://github.com/AbimanyuDA/Simple-ERP.git data/target_repo
 ```
+
+Simple-ERP layout (what gets indexed):
+
+| Path | Contents |
+|---|---|
+| `backend/internal/<module>/` | Go domain code: auth, finance, inventory, masterdata, purchasing, reporting, sales, platform |
+| `backend/migrations/` | SQL migrations (DB tables) |
+| `backend/test/` | Go integration tests |
+| `frontend/app/`, `frontend/features/` | Next.js pages and feature modules (TS/TSX) |
+| `api/openapi.yaml` | API routes |
+| `docs/` | Simple-ERP's own BPMN models — **excluded from the index**, used only as scenario sources |
 
 ## Usage
 
