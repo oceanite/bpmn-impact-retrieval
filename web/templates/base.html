@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}BPMN Impact Retrieval{% endblock %}</title>
+  <style>
+    :root { --ink:#1d2433; --muted:#5d6678; --line:#d9dde5; --bg:#f6f7f9; --accent:#2457c5; --ok:#1f7a45; --bad:#b3261e; }
+    * { box-sizing: border-box; }
+    body { margin:0; font:14px/1.5 system-ui, sans-serif; color:var(--ink); background:var(--bg); }
+    header { background:#fff; border-bottom:1px solid var(--line); padding:12px 24px; display:flex; gap:24px; align-items:center; flex-wrap:wrap; }
+    header strong { font-size:16px; }
+    header a { color:var(--muted); text-decoration:none; } header a.active { color:var(--accent); font-weight:600; }
+    main { max-width:1200px; margin:0 auto; padding:24px; }
+    section { background:#fff; border:1px solid var(--line); border-radius:8px; padding:16px 20px; margin-bottom:20px; }
+    h2 { font-size:15px; margin:0 0 12px; }
+    form.grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; align-items:end; }
+    label { display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--muted); }
+    input, select { font:inherit; padding:6px 8px; border:1px solid var(--line); border-radius:6px; background:#fff; }
+    button { font:inherit; padding:8px 16px; border:0; border-radius:6px; background:var(--accent); color:#fff; cursor:pointer; }
+    details summary { cursor:pointer; color:var(--muted); margin:8px 0; }
+    .table-wrap { overflow-x:auto; }
+    table { border-collapse:collapse; width:100%; }
+    th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { font-size:12px; color:var(--muted); font-weight:600; }
+    td.num { text-align:right; font-variant-numeric:tabular-nums; }
+    code { font:12px ui-monospace, monospace; }
+    .tag { display:inline-block; padding:1px 6px; border-radius:4px; font-size:11px; background:#eef1f6; margin:1px; }
+    .added { color:var(--ok); } .removed { color:var(--bad); } .modified { color:#9a6700; }
+    .tp { color:var(--ok); } .fp { color:var(--bad); } .fn { color:var(--muted); }
+    .error { color:var(--bad); font-weight:600; }
+    .best { font-weight:700; }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>BPMN Change Impact Retrieval</strong>
+    <a href="/" class="{% block nav_map %}{% endblock %}">Mapping</a>
+    <a href="/evaluation" class="{% block nav_eval %}{% endblock %}">Evaluation</a>
+  </header>
+  <main>{% block content %}{% endblock %}</main>
+</body>
+</html>

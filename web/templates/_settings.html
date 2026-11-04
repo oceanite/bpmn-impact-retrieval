@@ -1,0 +1,11 @@
+<details>
+  <summary>Settings (BM25 k1, b, top-k, field weights)</summary>
+  <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">
+    <label>k1 <input type="number" name="k1" step="0.1" min="0" value="{{ settings.k1 }}"></label>
+    <label>b <input type="number" name="b" step="0.05" min="0" max="1" value="{{ settings.b }}"></label>
+    {% if show_top_k %}<label>top-k <input type="number" name="top_k" min="1" max="200" value="{{ settings.top_k }}"></label>{% endif %}
+    {% for f in fields %}
+    <label>weight: {{ f }} <input type="number" name="w_{{ f }}" step="0.5" min="0" value="{{ settings.weights[f] }}"></label>
+    {% endfor %}
+  </div>
+</details>

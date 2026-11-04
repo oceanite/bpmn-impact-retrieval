@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Mapping · BPMN Impact Retrieval{% endblock %}
+{% block nav_map %}active{% endblock %}
+{% block content %}
+<section>
+  <h2>1. Choose BPMN versions</h2>
+  <form method="post" enctype="multipart/form-data">
+    <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end">
+      <label>Scenario
+        <select name="scenario">
+          <option value="">(upload instead)</option>
+          {% for s in scenarios %}<option {% if s == selected.scenario %}selected{% endif %}>{{ s }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>Old BPMN <input type="file" name="old_file" accept=".bpmn,.xml"></label>
+      <label>New BPMN <input type="file" name="new_file" accept=".bpmn,.xml"></label>
+      <label>Method
+        <select name="method">
+          {% for m in methods %}<option {% if m == selected.method %}selected{% endif %}>{{ m }}</option>{% endfor %}
+        </select>
+      </label>
+      <button type="submit">Find impacted code</button>
+    </div>
+    {% with show_top_k=True %}{% include "_settings.html" %}{% endwith %}
+  </form>
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+</section>
+
+{% if report %}
+<section>
+  <h2>2. Detected changes ({{ report.changes|length }})</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Change</th><th>Element</th><th>Type</th><th>Name</th><th>Changed fields</th></tr>
+    {% for c in report.changes %}
+    <tr>
+      <td class="{{ c.change_type.value }}">{{ c.change_type.value }}</td>
+      <td><code>{{ c.element_id }}</code></td>
+      <td>{{ c.element.type }}</td>
+      <td>{{ c.element.name }}</td>
+      <td>{% for f in c.fields %}<span class="tag">{{ f.field }}: {{ f.old }} → {{ f.new }}</span>{% endfor %}</td>
+    </tr>
+    {% endfor %}
+  </table></div>
+  <details><summary>Query sent to retrieval ({{ report.query.parts|length }} parts)</summary>
+    {% for p in report.query.parts %}<span class="tag">{{ p.text }} · {{ p.role }} ×{{ p.weight }}</span>{% endfor %}
+  </details>
+</section>
+
+<section>
+  <h2>3. Ranked impact ({{ report.method }}, top {{ report.results|length }}, {{ '%.1f'|format(report.latency_ms) }} ms)</h2>
+  <div class="table-wrap"><table>
+    <tr><th>#</th><th>Score</th><th>File</th><th>Function</th><th>Kind</th><th>Evidence (term @ field)</th></tr>
+    {% for r in report.results %}
+    <tr>
+      <td class="num">{{ r.rank }}</td>
+      <td class="num">{{ '%.3f'|format(r.score) }}</td>
+      <td><code>{{ r.document.path }}</code></td>
+      <td><code>{{ r.document.function or '—' }}</code></td>
+      <td>{{ r.document.kind }}</td>
+      <td>{% for e in r.evidence[:6] %}<span class="tag">{{ e.term }} @ {{ e.field }}</span>{% endfor %}</td>
+    </tr>
+    {% else %}<tr><td colspan="6">No matching code.</td></tr>{% endfor %}
+  </table></div>
+</section>
+{% endif %}
+{% endblock %}

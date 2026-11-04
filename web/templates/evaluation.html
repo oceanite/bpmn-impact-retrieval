@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Evaluation · BPMN Impact Retrieval{% endblock %}
+{% block nav_eval %}active{% endblock %}
+{% block content %}
+<section>
+  <h2>Compare methods against the ground truth</h2>
+  <form method="get">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-items:end">
+      <label>k <input type="number" name="k" min="1" max="50" value="{{ k }}"></label>
+      <label>Match level
+        <select name="level">
+          <option value="file" {% if level == 'file' %}selected{% endif %}>file</option>
+          <option value="function" {% if level == 'function' %}selected{% endif %}>function</option>
+        </select>
+      </label>
+      <button type="submit">Evaluate</button>
+    </div>
+    {% with show_top_k=False %}{% include "_settings.html" %}{% endwith %}
+  </form>
+</section>
+
+<section>
+  <h2>Mean over {{ per_scenario|length }} scenarios at k = {{ k }} ({{ level }} level)</h2>
+  {% set best_f1 = summary|map(attribute='f1')|max %}
+  <div class="table-wrap"><table>
+    <tr><th>Method</th><th>P@k</th><th>R@k</th><th>F1@k</th><th>MRR</th><th>FPR@k</th><th>Latency (ms)</th></tr>
+    {% for row in summary %}
+    <tr class="{% if row.f1 == best_f1 %}best{% endif %}">
+      <td>{{ row.method }}</td>
+      <td class="num">{{ '%.3f'|format(row.precision) }}</td>
+      <td class="num">{{ '%.3f'|format(row.recall) }}</td>
+      <td class="num">{{ '%.3f'|format(row.f1) }}</td>
+      <td class="num">{{ '%.3f'|format(row.mrr) }}</td>
+      <td class="num">{{ '%.4f'|format(row.fpr) }}</td>
+      <td class="num">{{ '%.1f'|format(row.latency_ms) }}</td>
+    </tr>
+    {% endfor %}
+  </table></div>
+</section>
+
+{% for sid, by_method in per_scenario.items() %}
+<section>
+  <h2>{{ sid }}</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Method</th><th>P@k</th><th>R@k</th><th>MRR</th><th>True positives</th><th>False positives</th><th>Missed (FN)</th></tr>
+    {% for m in methods %}{% set x = by_method[m] %}
+    <tr>
+      <td>{{ m }}</td>
+      <td class="num">{{ '%.2f'|format(x.cut.precision) }}</td>
+      <td class="num">{{ '%.2f'|format(x.cut.recall) }}</td>
+      <td class="num">{{ '%.2f'|format(x.mrr) }}</td>
+      <td>{% for t in x.cut.tp %}<div class="tp"><code>{{ t }}</code></div>{% endfor %}</td>
+      <td>{% for t in x.cut.fp %}<div class="fp"><code>{{ t }}</code></div>{% endfor %}</td>
+      <td>{% for t in x.cut.fn %}<div class="fn"><code>{{ t }}</code></div>{% endfor %}</td>
+    </tr>
+    {% endfor %}
+  </table></div>
+</section>
+{% endfor %}
+{% endblock %}
