@@ -1,0 +1,337 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tns="https://simple-erp.local/bpm-haqi/l0-simple-erp" xmlns:c0="https://simple-erp.local/bpm-haqi/l1-access" xmlns:c1="https://simple-erp.local/bpm-haqi/l1-p2p" xmlns:c2="https://simple-erp.local/bpm-haqi/l1-o2c" xmlns:c3="https://simple-erp.local/bpm-haqi/l1-inventory" xmlns:c4="https://simple-erp.local/bpm-haqi/l1-finance" xmlns:c5="https://simple-erp.local/bpm-haqi/l1-administration" xmlns:c6="https://simple-erp.local/bpm-haqi/l1-reporting" id="Definitions_l0_simple_erp" targetNamespace="https://simple-erp.local/bpm-haqi/l0-simple-erp" exporter="Simple ERP source-backed documentation" exporterVersion="1">
+  <bpmn:import namespace="https://simple-erp.local/bpm-haqi/l1-access" location="../level-1/l1-access.bpmn" importType="http://www.omg.org/spec/BPMN/20100524/MODEL"/>
+  <bpmn:import namespace="https://simple-erp.local/bpm-haqi/l1-p2p" location="../level-1/l1-p2p.bpmn" importType="http://www.omg.org/spec/BPMN/20100524/MODEL"/>
+  <bpmn:import namespace="https://simple-erp.local/bpm-haqi/l1-o2c" location="../level-1/l1-o2c.bpmn" importType="http://www.omg.org/spec/BPMN/20100524/MODEL"/>
+  <bpmn:import namespace="https://simple-erp.local/bpm-haqi/l1-inventory" location="../level-1/l1-inventory.bpmn" importType="http://www.omg.org/spec/BPMN/20100524/MODEL"/>
+  <bpmn:import namespace="https://simple-erp.local/bpm-haqi/l1-finance" location="../level-1/l1-finance.bpmn" importType="http://www.omg.org/spec/BPMN/20100524/MODEL"/>
+  <bpmn:import namespace="https://simple-erp.local/bpm-haqi/l1-administration" location="../level-1/l1-administration.bpmn" importType="http://www.omg.org/spec/BPMN/20100524/MODEL"/>
+  <bpmn:import namespace="https://simple-erp.local/bpm-haqi/l1-reporting" location="../level-1/l1-reporting.bpmn" importType="http://www.omg.org/spec/BPMN/20100524/MODEL"/>
+  <bpmn:process id="Process_l0_simple_erp" name="Simple ERP - landscape keseluruhan" isExecutable="false">
+    <bpmn:documentation>Level 0; source snapshot 2026-10-21; descriptive as-is working tree, not deployed-runtime proof.
+Landscape berformat BPMN: satu kebutuhan dipilih per instansi. Bukan workflow monolitik yang mengharuskan semua modul berjalan. Level 0-3 adalah konvensi dekomposisi paket ini, bukan level wajib standar BPMN.</bpmn:documentation>
+    <bpmn:laneSet id="Lanes_l0_simple_erp">
+      <bpmn:lane id="Lane_l0_simple_erp_0" name="Pemilik kebutuhan (role pada detail)">
+        <bpmn:flowNodeRef>l0_simple_erp_start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_choose</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_branch</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_call0</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_end0</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_call1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_end1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_call2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_end2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_call3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_end3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_call4</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_end4</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_call5</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_end5</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_call6</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>l0_simple_erp_end6</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="l0_simple_erp_start" name="Kebutuhan muncul">
+      <bpmn:outgoing>l0_simple_erp_Flow_0</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="l0_simple_erp_choose" name="Pilih kebutuhan">
+      <bpmn:incoming>l0_simple_erp_Flow_0</bpmn:incoming>
+      <bpmn:outgoing>l0_simple_erp_Flow_1</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="l0_simple_erp_branch" name="Kebutuhan apa?" default="l0_simple_erp_Flow_14" gatewayDirection="Diverging">
+      <bpmn:incoming>l0_simple_erp_Flow_1</bpmn:incoming>
+      <bpmn:outgoing>l0_simple_erp_Flow_2</bpmn:outgoing>
+      <bpmn:outgoing>l0_simple_erp_Flow_4</bpmn:outgoing>
+      <bpmn:outgoing>l0_simple_erp_Flow_6</bpmn:outgoing>
+      <bpmn:outgoing>l0_simple_erp_Flow_8</bpmn:outgoing>
+      <bpmn:outgoing>l0_simple_erp_Flow_10</bpmn:outgoing>
+      <bpmn:outgoing>l0_simple_erp_Flow_12</bpmn:outgoing>
+      <bpmn:outgoing>l0_simple_erp_Flow_14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="l0_simple_erp_call0" name="Akses dan pengguna" calledElement="c0:Process_l1_access">
+      <bpmn:incoming>l0_simple_erp_Flow_2</bpmn:incoming>
+      <bpmn:outgoing>l0_simple_erp_Flow_3</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="l0_simple_erp_end0" name="Aksi selesai / hasil diterima">
+      <bpmn:incoming>l0_simple_erp_Flow_3</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:callActivity id="l0_simple_erp_call1" name="Procure to Pay" calledElement="c1:Process_l1_p2p">
+      <bpmn:incoming>l0_simple_erp_Flow_4</bpmn:incoming>
+      <bpmn:outgoing>l0_simple_erp_Flow_5</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="l0_simple_erp_end1" name="Aksi selesai / hasil diterima">
+      <bpmn:incoming>l0_simple_erp_Flow_5</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:callActivity id="l0_simple_erp_call2" name="Order to Cash" calledElement="c2:Process_l1_o2c">
+      <bpmn:incoming>l0_simple_erp_Flow_6</bpmn:incoming>
+      <bpmn:outgoing>l0_simple_erp_Flow_7</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="l0_simple_erp_end2" name="Aksi selesai / hasil diterima">
+      <bpmn:incoming>l0_simple_erp_Flow_7</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:callActivity id="l0_simple_erp_call3" name="Pengendalian inventory" calledElement="c3:Process_l1_inventory">
+      <bpmn:incoming>l0_simple_erp_Flow_8</bpmn:incoming>
+      <bpmn:outgoing>l0_simple_erp_Flow_9</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="l0_simple_erp_end3" name="Aksi selesai / hasil diterima">
+      <bpmn:incoming>l0_simple_erp_Flow_9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:callActivity id="l0_simple_erp_call4" name="Finance AP dan AR" calledElement="c4:Process_l1_finance">
+      <bpmn:incoming>l0_simple_erp_Flow_10</bpmn:incoming>
+      <bpmn:outgoing>l0_simple_erp_Flow_11</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="l0_simple_erp_end4" name="Aksi selesai / hasil diterima">
+      <bpmn:incoming>l0_simple_erp_Flow_11</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:callActivity id="l0_simple_erp_call5" name="Master data dan konfigurasi" calledElement="c5:Process_l1_administration">
+      <bpmn:incoming>l0_simple_erp_Flow_12</bpmn:incoming>
+      <bpmn:outgoing>l0_simple_erp_Flow_13</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="l0_simple_erp_end5" name="Aksi selesai / hasil diterima">
+      <bpmn:incoming>l0_simple_erp_Flow_13</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:callActivity id="l0_simple_erp_call6" name="Monitoring, laporan dan audit" calledElement="c6:Process_l1_reporting">
+      <bpmn:incoming>l0_simple_erp_Flow_14</bpmn:incoming>
+      <bpmn:outgoing>l0_simple_erp_Flow_15</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="l0_simple_erp_end6" name="Aksi selesai / hasil diterima">
+      <bpmn:incoming>l0_simple_erp_Flow_15</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_0" sourceRef="l0_simple_erp_start" targetRef="l0_simple_erp_choose"/>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_1" sourceRef="l0_simple_erp_choose" targetRef="l0_simple_erp_branch"/>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_2" sourceRef="l0_simple_erp_branch" targetRef="l0_simple_erp_call0" name="Akses dan pengguna">
+      <bpmn:conditionExpression language="text/plain" xsi:type="bpmn:tFormalExpression">Akses dan pengguna</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_3" sourceRef="l0_simple_erp_call0" targetRef="l0_simple_erp_end0"/>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_4" sourceRef="l0_simple_erp_branch" targetRef="l0_simple_erp_call1" name="Procure to Pay">
+      <bpmn:conditionExpression language="text/plain" xsi:type="bpmn:tFormalExpression">Procure to Pay</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_5" sourceRef="l0_simple_erp_call1" targetRef="l0_simple_erp_end1"/>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_6" sourceRef="l0_simple_erp_branch" targetRef="l0_simple_erp_call2" name="Order to Cash">
+      <bpmn:conditionExpression language="text/plain" xsi:type="bpmn:tFormalExpression">Order to Cash</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_7" sourceRef="l0_simple_erp_call2" targetRef="l0_simple_erp_end2"/>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_8" sourceRef="l0_simple_erp_branch" targetRef="l0_simple_erp_call3" name="Pengendalian inventory">
+      <bpmn:conditionExpression language="text/plain" xsi:type="bpmn:tFormalExpression">Pengendalian inventory</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_9" sourceRef="l0_simple_erp_call3" targetRef="l0_simple_erp_end3"/>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_10" sourceRef="l0_simple_erp_branch" targetRef="l0_simple_erp_call4" name="Finance AP dan AR">
+      <bpmn:conditionExpression language="text/plain" xsi:type="bpmn:tFormalExpression">Finance AP dan AR</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_11" sourceRef="l0_simple_erp_call4" targetRef="l0_simple_erp_end4"/>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_12" sourceRef="l0_simple_erp_branch" targetRef="l0_simple_erp_call5" name="Master data dan konfigurasi">
+      <bpmn:conditionExpression language="text/plain" xsi:type="bpmn:tFormalExpression">Master data dan konfigurasi</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_13" sourceRef="l0_simple_erp_call5" targetRef="l0_simple_erp_end5"/>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_14" sourceRef="l0_simple_erp_branch" targetRef="l0_simple_erp_call6" name="Monitoring, laporan dan audit"/>
+    <bpmn:sequenceFlow id="l0_simple_erp_Flow_15" sourceRef="l0_simple_erp_call6" targetRef="l0_simple_erp_end6"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collab_l0_simple_erp">
+    <bpmn:participant id="Pool_l0_simple_erp" name="Simple ERP" processRef="Process_l0_simple_erp"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_l0_simple_erp">
+    <bpmndi:BPMNPlane id="Plane_l0_simple_erp" bpmnElement="Collab_l0_simple_erp">
+      <bpmndi:BPMNShape id="Pool_l0_simple_erp_di" bpmnElement="Pool_l0_simple_erp" isHorizontal="true">
+        <dc:Bounds x="20" y="100" width="1280" height="1165"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_l0_simple_erp_0_di" bpmnElement="Lane_l0_simple_erp_0" isHorizontal="true">
+        <dc:Bounds x="50" y="100.0" width="1250" height="1165.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_start_di" bpmnElement="l0_simple_erp_start">
+        <dc:Bounds x="200" y="663.5" width="38" height="38"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="145" y="706.5" width="148" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_choose_di" bpmnElement="l0_simple_erp_choose">
+        <dc:Bounds x="310" y="637.5" width="178" height="90"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_branch_di" bpmnElement="l0_simple_erp_branch">
+        <dc:Bounds x="550" y="655.5" width="54" height="54"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="495" y="714.5" width="164" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_call0_di" bpmnElement="l0_simple_erp_call0">
+        <dc:Bounds x="850" y="145" width="178" height="90"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_end0_di" bpmnElement="l0_simple_erp_end0">
+        <dc:Bounds x="1120" y="171" width="38" height="38"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1065" y="214" width="148" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_call1_di" bpmnElement="l0_simple_erp_call1">
+        <dc:Bounds x="850" y="300" width="178" height="90"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_end1_di" bpmnElement="l0_simple_erp_end1">
+        <dc:Bounds x="1120" y="326" width="38" height="38"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1065" y="369" width="148" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_call2_di" bpmnElement="l0_simple_erp_call2">
+        <dc:Bounds x="850" y="455" width="178" height="90"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_end2_di" bpmnElement="l0_simple_erp_end2">
+        <dc:Bounds x="1120" y="481" width="38" height="38"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1065" y="524" width="148" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_call3_di" bpmnElement="l0_simple_erp_call3">
+        <dc:Bounds x="850" y="610" width="178" height="90"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_end3_di" bpmnElement="l0_simple_erp_end3">
+        <dc:Bounds x="1120" y="636" width="38" height="38"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1065" y="679" width="148" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_call4_di" bpmnElement="l0_simple_erp_call4">
+        <dc:Bounds x="850" y="765" width="178" height="90"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_end4_di" bpmnElement="l0_simple_erp_end4">
+        <dc:Bounds x="1120" y="791" width="38" height="38"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1065" y="834" width="148" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_call5_di" bpmnElement="l0_simple_erp_call5">
+        <dc:Bounds x="850" y="920" width="178" height="90"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_end5_di" bpmnElement="l0_simple_erp_end5">
+        <dc:Bounds x="1120" y="946" width="38" height="38"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1065" y="989" width="148" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_call6_di" bpmnElement="l0_simple_erp_call6">
+        <dc:Bounds x="850" y="1075" width="178" height="90"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="l0_simple_erp_end6_di" bpmnElement="l0_simple_erp_end6">
+        <dc:Bounds x="1120" y="1101" width="38" height="38"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1065" y="1144" width="148" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_0_di" bpmnElement="l0_simple_erp_Flow_0">
+        <di:waypoint x="238" y="682.5"/>
+        <di:waypoint x="274.0" y="682.5"/>
+        <di:waypoint x="274.0" y="682.5"/>
+        <di:waypoint x="310" y="682.5"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_1_di" bpmnElement="l0_simple_erp_Flow_1">
+        <di:waypoint x="488" y="682.5"/>
+        <di:waypoint x="519.0" y="682.5"/>
+        <di:waypoint x="519.0" y="682.5"/>
+        <di:waypoint x="550" y="682.5"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_2_di" bpmnElement="l0_simple_erp_Flow_2">
+        <di:waypoint x="604" y="682.5"/>
+        <di:waypoint x="645" y="682.5"/>
+        <di:waypoint x="645" y="190.0"/>
+        <di:waypoint x="850" y="190.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="680" y="135.0" width="150" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_3_di" bpmnElement="l0_simple_erp_Flow_3">
+        <di:waypoint x="1028" y="190.0"/>
+        <di:waypoint x="1074.0" y="190.0"/>
+        <di:waypoint x="1074.0" y="190.0"/>
+        <di:waypoint x="1120" y="190.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_4_di" bpmnElement="l0_simple_erp_Flow_4">
+        <di:waypoint x="604" y="682.5"/>
+        <di:waypoint x="645" y="682.5"/>
+        <di:waypoint x="645" y="345.0"/>
+        <di:waypoint x="850" y="345.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="680" y="290.0" width="150" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_5_di" bpmnElement="l0_simple_erp_Flow_5">
+        <di:waypoint x="1028" y="345.0"/>
+        <di:waypoint x="1074.0" y="345.0"/>
+        <di:waypoint x="1074.0" y="345.0"/>
+        <di:waypoint x="1120" y="345.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_6_di" bpmnElement="l0_simple_erp_Flow_6">
+        <di:waypoint x="604" y="682.5"/>
+        <di:waypoint x="645" y="682.5"/>
+        <di:waypoint x="645" y="500.0"/>
+        <di:waypoint x="850" y="500.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="680" y="445.0" width="150" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_7_di" bpmnElement="l0_simple_erp_Flow_7">
+        <di:waypoint x="1028" y="500.0"/>
+        <di:waypoint x="1074.0" y="500.0"/>
+        <di:waypoint x="1074.0" y="500.0"/>
+        <di:waypoint x="1120" y="500.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_8_di" bpmnElement="l0_simple_erp_Flow_8">
+        <di:waypoint x="604" y="682.5"/>
+        <di:waypoint x="645" y="682.5"/>
+        <di:waypoint x="645" y="655.0"/>
+        <di:waypoint x="850" y="655.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="680" y="600.0" width="150" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_9_di" bpmnElement="l0_simple_erp_Flow_9">
+        <di:waypoint x="1028" y="655.0"/>
+        <di:waypoint x="1074.0" y="655.0"/>
+        <di:waypoint x="1074.0" y="655.0"/>
+        <di:waypoint x="1120" y="655.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_10_di" bpmnElement="l0_simple_erp_Flow_10">
+        <di:waypoint x="604" y="682.5"/>
+        <di:waypoint x="645" y="682.5"/>
+        <di:waypoint x="645" y="810.0"/>
+        <di:waypoint x="850" y="810.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="680" y="755.0" width="150" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_11_di" bpmnElement="l0_simple_erp_Flow_11">
+        <di:waypoint x="1028" y="810.0"/>
+        <di:waypoint x="1074.0" y="810.0"/>
+        <di:waypoint x="1074.0" y="810.0"/>
+        <di:waypoint x="1120" y="810.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_12_di" bpmnElement="l0_simple_erp_Flow_12">
+        <di:waypoint x="604" y="682.5"/>
+        <di:waypoint x="645" y="682.5"/>
+        <di:waypoint x="645" y="965.0"/>
+        <di:waypoint x="850" y="965.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="680" y="910.0" width="150" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_13_di" bpmnElement="l0_simple_erp_Flow_13">
+        <di:waypoint x="1028" y="965.0"/>
+        <di:waypoint x="1074.0" y="965.0"/>
+        <di:waypoint x="1074.0" y="965.0"/>
+        <di:waypoint x="1120" y="965.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_14_di" bpmnElement="l0_simple_erp_Flow_14">
+        <di:waypoint x="604" y="682.5"/>
+        <di:waypoint x="645" y="682.5"/>
+        <di:waypoint x="645" y="1120.0"/>
+        <di:waypoint x="850" y="1120.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="680" y="1065.0" width="150" height="45"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="l0_simple_erp_Flow_15_di" bpmnElement="l0_simple_erp_Flow_15">
+        <di:waypoint x="1028" y="1120.0"/>
+        <di:waypoint x="1074.0" y="1120.0"/>
+        <di:waypoint x="1074.0" y="1120.0"/>
+        <di:waypoint x="1120" y="1120.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
