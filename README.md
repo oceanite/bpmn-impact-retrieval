@@ -32,12 +32,13 @@ Simple-ERP source
 | `data/target_repo/` | Simple-ERP clone — **gitignored, never commit** |
 | `data/bpmn/scenarios/<ID>/` | `old.bpmn`, `new.bpmn`, `scenario.md` per change scenario |
 | `data/ground_truth/ground_truth.csv` | Answer key: `scenario_id,file_path,function` |
+| `data/bpmn/real/` | A real old/new BPMN pair from Simple-ERP's history (demo upload, no ground truth) |
 | `src/impact_retrieval/bpmn/` | BPMN parsing and diff |
 | `src/impact_retrieval/query/` | Changed elements → text query |
 | `src/impact_retrieval/code/` | Codebase extraction into documents |
 | `src/impact_retrieval/preprocessing/` | Tokenization, identifier splitting, stemming |
 | `src/impact_retrieval/retrieval/` | BM25, keyword baseline, TF-IDF |
-| `src/impact_retrieval/report/` | Impact report construction |
+| `src/impact_retrieval/report/` | Reserved (empty); the report itself is `ImpactReport` in `types.py`, built by `pipeline.py` |
 | `src/impact_retrieval/evaluation/` | Precision@k, Recall@k, F1@k, MRR, FPR, latency |
 | `src/impact_retrieval/pipeline.py` | Single entry point used by web and experiments |
 | `web/` | FastAPI website (mapping + evaluation pages) |

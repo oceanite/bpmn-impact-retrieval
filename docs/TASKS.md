@@ -1,7 +1,7 @@
 # Pembagian tugas (Kelompok 9)
 
 Status per 2026-11-04: **seluruh pipeline sudah jalan dari ujung ke ujung**, termasuk website
-dan evaluasi (107 test lulus). Pekerjaan yang tersisa adalah *memperbaiki, menguji dan melaporkan*,
+dan evaluasi, plus upload source code berbentuk ZIP (129 test lulus). Pekerjaan yang tersisa adalah *memperbaiki, menguji dan melaporkan*,
 bukan membangun dari nol. Baca `docs/ARCHITECTURE.md` dulu.
 
 ## Cara mulai (semua anggota)
@@ -12,10 +12,11 @@ cd bpmn-impact-retrieval
 python -m venv .venv
 # Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
+pip install -e .                         # supaya `impact_retrieval` bisa di-import
 git clone https://github.com/AbimanyuDA/Simple-ERP.git data/target_repo
 
 pytest                                   # semua test harus lulus
-python -m impact_retrieval.pipeline S03  # (set PYTHONPATH=src dulu, atau pip install -e .)
+python -m impact_retrieval.pipeline S03
 python experiments/run_eval.py           # tabel BM25 vs baseline
 uvicorn web.app:app --reload             # buka http://127.0.0.1:8000
 ```
@@ -31,7 +32,7 @@ Aturan kerja:
 
 ## Lead (bagian paling teknis): ekstraksi, retrieval, integrasi
 
-Sudah selesai: `code/`, `retrieval/`, `pipeline.py`, `types.py`.
+Sudah selesai: `code/` (termasuk `archive.py` untuk upload ZIP yang aman), `retrieval/`, `pipeline.py`, `types.py`.
 
 - [ ] Review dan merge PR anggota lain.
 - [ ] **Ablation study per field:** jalankan evaluasi dengan satu field dimatikan (`field_weights.<field>: 0`)
@@ -51,8 +52,11 @@ Versi dasar sudah jalan. Tugasnya memperbaiki kualitas query.
       Ukur dampaknya dengan `run_eval.py`.
 - [ ] **Kamus sinonim domain** (opsional di config, default mati), misalnya `confirm ↔ confirmation`
       (stemming sudah menangani sebagian), `invoice ↔ bill`, `approve ↔ review`. Harus deterministik.
+- [ ] **Stopwords bahasa Indonesia** (`dan`, `atau`, `yang`, `di`, `ke`, `dari`, ...) di config. Ini temuan nyata:
+      pada pasangan asli `data/bpmn/real/`, BPMN dan UI Simple-ERP cocok terutama lewat kata "dan"
+      (lihat `data/bpmn/real/README.md`). Pastikan angka S01–S06 tidak berubah.
 - [ ] **Kamus Indonesia → Inggris** untuk model `docs/bpm-haqi` (misalnya `pengguna → user`, `penjualan → sales`).
-      Dengan ini model berbahasa Indonesia juga bisa dipakai.
+      Dengan ini model berbahasa Indonesia juga bisa dipakai. Uji dengan pasangan di `data/bpmn/real/`.
 - [ ] **Eksperimen bobot query** (`query.weights`): misalnya apakah `documentation: 1.0` lebih baik dari 0.5.
       Catat hasilnya, dan hati-hati overfitting (lihat Orang 3).
 - [ ] Test untuk setiap fitur baru (`tests/test_preprocessing.py`, `tests/test_query.py`).
@@ -81,12 +85,15 @@ Kriteria selesai: ground truth sudah direview, minimal 10 skenario, dan hasil tu
 
 File: `web/`, `docs/`, README.
 
-Versi dasar sudah jalan: halaman Mapping, Evaluation, Settings, dan JSON API.
+Versi dasar sudah jalan: halaman Mapping (termasuk upload ZIP source code opsional), Evaluation, Settings,
+dan JSON API.
 
 - [ ] **Tampilan diff yang lebih jelas:** kelompokkan per elemen, warna added/removed/modified, sembunyikan
       flow tanpa nama secara default.
 - [ ] (Opsional) Render diagram BPMN dengan **bpmn-js** dan sorot elemen yang berubah.
 - [ ] **Download hasil:** tombol unduh impact report sebagai JSON/CSV (`report.to_dict()` sudah tersedia).
+- [ ] **Upload ZIP:** tampilkan batas ukuran (`config.upload`) di form, dan cantumkan nama codebase di file download.
+      Ingat: halaman Evaluation selalu memakai Simple-ERP, karena ground truth hanya ada untuk Simple-ERP.
 - [ ] Halaman Evaluation: grafik P@k/R@k untuk k = 1..10, dan pilihan subset skenario.
 - [ ] Test untuk setiap halaman atau fitur baru di `tests/test_web.py`.
 - [ ] **Laporan akhir** (gunakan "Threats to validity" di `docs/ARCHITECTURE.md`), **slide**, dan screenshot di README.
@@ -98,4 +105,5 @@ Kriteria selesai: demo bisa dijalankan dari clone bersih mengikuti README, dan s
 ## Hal yang sengaja belum dikerjakan (diskusikan dulu sebelum menambah)
 * Dampak berupa **file baru** (migration/adapter baru) tidak bisa di-retrieve; sudah dikecualikan dari ground truth.
 * Teks UI Simple-ERP berbahasa Indonesia; query dari model berbahasa Inggris tidak cocok dengannya.
+* Codebase dari upload ZIP tidak punya ground truth, jadi hanya bisa dipakai di halaman Mapping, tidak dievaluasi.
 * ID elemen yang berganti dianggap remove + add, bukan rename.

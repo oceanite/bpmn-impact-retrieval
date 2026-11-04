@@ -4,7 +4,9 @@
 Kalau deadline resmi dari dosen berbeda, geser semua tanggal dengan selisih yang sama. Urutan milestone jangan diubah.
 
 **Titik awal (4 November 2026):** seluruh pipeline sudah berjalan dari BPMN sampai ranking file/fungsi, termasuk
-website dan evaluasi. Ada 6 skenario, 41 baris ground truth, dan 107 test yang lulus. Lima minggu ini dipakai untuk
+website dan evaluasi. Website juga bisa menerima source code lain dalam bentuk ZIP. Ada 6 skenario, 41 baris
+ground truth, 1 pasangan BPMN asli dari riwayat Simple-ERP (`data/bpmn/real/`, untuk demo), dan 129 test yang lulus.
+Lima minggu ini dipakai untuk
 **memvalidasi, memperbaiki, mengevaluasi dengan jujur, dan melaporkan**, bukan untuk membangun dari nol.
 Detail teknis ada di [`ARCHITECTURE.md`](ARCHITECTURE.md), dan daftar tugas per modul di [`TASKS.md`](TASKS.md).
 
@@ -82,13 +84,13 @@ gantt
 
 | Peran | Tugas | Estimasi |
 |---|---|---|
-| Semua | Clone repo, buat venv, `pip install -r requirements.txt` dan `pip install -e .`, clone Simple-ERP ke `data/target_repo`, lalu `pytest` (107 lulus) | 1–2 jam |
-| Semua | Jalankan `python -m impact_retrieval.pipeline S03`, buka website (`uvicorn web.app:app --reload`), coba halaman Mapping dan Evaluation | 1 jam |
+| Semua | Clone repo, buat venv, `pip install -r requirements.txt` dan `pip install -e .`, clone Simple-ERP ke `data/target_repo`, lalu `pytest` (129 lulus) | 1–2 jam |
+| Semua | Jalankan `python -m impact_retrieval.pipeline S03`, buka website (`uvicorn web.app:app --reload`), coba halaman Mapping dan Evaluation, termasuk upload pasangan `data/bpmn/real/` dan upload ZIP | 1 jam |
 | Lead | **Sesi walkthrough (1–2 jam):** jelaskan diagram di `ARCHITECTURE.md`, telusuri satu skenario dari BPMN sampai ranking, tunjukkan di mana setiap modul berada | 3 jam (dengan persiapan) |
 | Lead | Buat GitHub Project board dan Issue dari `TASKS.md`, atur branch protection `main` (wajib PR) | 1 jam |
 | Semua | Baca modul yang akan dipegang sendiri beserta test-nya | 2 jam |
 
-**Deliverable:** setiap anggota memposting screenshot `107 passed` dan halaman website di grup.
+**Deliverable:** setiap anggota memposting screenshot `129 passed` dan halaman website di grup.
 Semua Issue M1 sudah dibuat dan di-assign.
 
 **Kriteria selesai:**
@@ -113,7 +115,7 @@ S01–S06 benar. Semua perbaikan nanti diukur terhadap baseline ini.
 | **Orang 3** | Review **41 baris ground truth** S01–S06: buka setiap file dan fungsi di Simple-ERP, cocokkan dengan aturan di `data/ground_truth/README.md`. Catat setiap baris yang ditambah, dihapus atau dipertahankan beserta alasannya. | 6 jam |
 | **Orang 3** | Bersama Lead: putuskan kasus yang masih ragu, misalnya `platform/config/config.go` di S05 | 1 jam |
 | **Orang 2** | Script `experiments/term_stats.py`: tampilkan 50 term dengan document frequency tertinggi di korpus, dan term query yang tidak pernah muncul di korpus. Hasilnya jadi bahan audit stopwords. | 4 jam |
-| **Orang 2** | Usulkan perubahan `code_stopwords` dan `bpmn_stopwords` (belum di-merge, hanya daftar beserta alasannya) | 2 jam |
+| **Orang 2** | Usulkan perubahan `code_stopwords` dan `bpmn_stopwords`, plus daftar **stopwords bahasa Indonesia** (`dan`, `atau`, `yang`, ...; temuan dari `data/bpmn/real/`). Belum di-merge, hanya daftar beserta alasannya. | 2 jam |
 | **Orang 4** | Rancang perbaikan UI (sketsa halaman Mapping dan Evaluation) dan **kerangka laporan** (judul bab, subbab, tabel/gambar yang dibutuhkan) | 6 jam |
 | **Lead** | Review PR, lalu setelah ground truth di-merge: jalankan `run_eval.py`, simpan hasil ke `docs/results/baseline.md`, dan buat tag `v0.1-baseline` | 3 jam |
 | **Lead** | Tulis bagian "Metodologi" untuk laporan: pipeline, BM25F, field, baseline | 4 jam |
@@ -146,9 +148,9 @@ S01–S06 benar. Semua perbaikan nanti diukur terhadap baseline ini.
 | **Orang 3** | Tambah entri S07–S10 di `EXPECTED_SCENARIOS` (`tests/test_bpmn_diff.py`), lalu **bekukan test set**: tidak ada lagi perubahan pada S07–S10 dan ground truth-nya setelah Jumat | 1 jam |
 | **Orang 2** | Terapkan stopwords hasil audit, lalu ukur dampaknya di **dev set saja** (S01–S06) | 3 jam |
 | **Orang 2** | Kamus sinonim domain (opsional di config, default mati), dengan test | 4 jam |
-| **Orang 2** | Kamus Indonesia → Inggris untuk model `docs/bpm-haqi` (opsional di config), dengan test | 3 jam |
+| **Orang 2** | Stopwords Indonesia dan kamus Indonesia → Inggris untuk model `docs/bpm-haqi` (opsional di config), dengan test. Cek hasilnya pada pasangan `data/bpmn/real/`. | 3 jam |
 | **Orang 4** | **Diff view** yang lebih jelas: dikelompokkan per elemen, warna berbeda untuk added/removed/modified, flow tanpa nama disembunyikan secara default | 4 jam |
-| **Orang 4** | Tombol **download** impact report (JSON dan CSV dari `report.to_dict()`), dengan test di `tests/test_web.py` | 3 jam |
+| **Orang 4** | Tombol **download** impact report (JSON dan CSV dari `report.to_dict()`, termasuk nama codebase target), dengan test di `tests/test_web.py`. Tampilkan juga batas ukuran upload ZIP di form. | 3 jam |
 | **Lead** | Review dan merge PR. Pastikan semua fitur baru bisa dinyalakan/dimatikan lewat config dan defaultnya tidak mengubah hasil baseline. | 4 jam |
 
 **Deliverable**
@@ -240,7 +242,7 @@ Jangan mengubah sistem untuk memperbaiki angka test set.
 | Peran | Tugas | Estimasi |
 |---|---|---|
 | **Orang 4** | Finalisasi laporan: masukan dari semua anggota, konsistensi angka dengan `docs/results/final.md`, daftar pustaka | 5 jam |
-| **Orang 4** | Finalisasi slide dan skenario demo: satu skenario dev, satu skenario test, plus halaman Evaluation | 3 jam |
+| **Orang 4** | Finalisasi slide dan skenario demo: satu skenario dev, satu skenario test, halaman Evaluation, dan (opsional) upload pasangan BPMN asli atau ZIP codebase lain | 3 jam |
 | **Semua** | **Gladi resik 2×** (Rabu dan Kamis), dengan waktu dicatat. Setiap orang membawakan bagiannya. | 2 jam |
 | **Semua** | **Latihan tanya jawab:** setiap orang menyiapkan 5 pertanyaan sulit tentang bagian orang lain. Lihat daftar contoh di bawah. | 2 jam |
 | **Lead** | Rilis: pastikan `pytest` lulus, README final, buat tag `v1.0` dan GitHub Release berisi ringkasan hasil | 2 jam |
@@ -266,6 +268,8 @@ Jangan mengubah sistem untuk memperbaiki angka test set.
 8. Apa yang terjadi jika ID elemen BPMN diganti oleh modeler? (dianggap remove + add)
 9. Apakah hasilnya deterministik? Bagaimana membuktikannya?
 10. Apa keterbatasan terbesar sistem ini, dan apa langkah pengembangan berikutnya?
+11. Bagaimana upload ZIP dibuat aman? (path `../` dan symlink ditolak, batas ukuran dan jumlah file, kode tidak pernah dijalankan)
+12. Kenapa codebase hasil upload ZIP tidak bisa dievaluasi? (tidak ada ground truth)
 
 ---
 
