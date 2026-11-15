@@ -37,6 +37,16 @@ preprocessing:
   # Words that appear in almost every BPMN model
   bpmn_stopwords: [task, process, start, end, event, gateway, flow, lane, level, completed,
                    requested, identified, ready, merge]
+  # Indonesian stopwords (conjunctions, prepositions, particles, common flow terms)
+  indonesian_stopwords: [dan, atau, serta, tetapi, tapi, melainkan, sedangkan, namun,
+                         karena, sebab, sehingga, agar, supaya, jika, kalau, bila, apabila,
+                         walaupun, meskipun, bahwa, setelah, sesudah, sebelum, ketika, saat,
+                         lalu, kemudian, di, ke, dari, pada, dalam, untuk, bagi, kepada, oleh,
+                         dengan, tentang, tanpa, antara, hingga, sampai, atas, bawah, ini,
+                         itu, yang, ada, adalah, ialah, tersebut, suatu, para, setiap, masing,
+                         per, pun, apa, apakah, bagaimana, kapan, mana, siapa, mengapa, kenapa,
+                         bisa, dapat, akan, telah, sudah, belum, tidak, bukan, alur, tahap,
+                         langkah, proses, kegiatan, mulai, selesai, aksi, hasil, diterima]
 
 query:
   drop_ids: true            # remove BPMN trace ids like SAL-SO-001 from query text

@@ -49,6 +49,11 @@ def test_query_and_code_terms_meet():
     assert set(a.tokens("Validate invoice match")) & set(a.tokens("MatchSupplierInvoice")) == {"match", "invoic"}
 
 
+def test_indonesian_stopwords():
+    a = Analyzer({"stemming": "none", "indonesian_stopwords": ["dan", "atau", "yang", "proses", "selesai"]})
+    assert a.tokens("Master data dan konfigurasi proses selesai") == ["master", "data", "konfigurasi"]
+
+
 def test_plain_words_is_grep_like():
     # lowercase, split on punctuation, English stopwords ("the", "to") removed, no stemming
     assert plain_words("Confirm the Order-to-Cash orders!") == ["confirm", "order", "cash", "orders"]
