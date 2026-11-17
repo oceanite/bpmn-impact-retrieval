@@ -128,14 +128,13 @@
 
 ---
 
-## 📅 Jadwal Kerja Harian Tim (17–20 Nov 2026)
+## 📅 Jadwal Kerja Harian Tim (17–19 Nov 2026)
 
 | Hari | Target Capaian | PIC Utama |
 |---|---|---|
 | **Selasa (17 Nov)** | Task context logic dirancang di `builder.py`; review baris borderline S01–S06 dimulai; UI diff didesain ulang. | Semua |
 | **Rabu (18 Nov)** | Unit test task context selesai; kamus sinonim & ID $\rightarrow$ EN diuji; endpoint download CSV/JSON dibuat. | Orang 2, Orang 4 |
 | **Kamis (19 Nov)** | **Batas Akhir Pembuatan Pull Request (PR).** Semua test lulus (`pytest`); review ground truth S07–S10 selesai. | Semua |
-| **Jumat (20 Nov)** | **Checkpoint Mingguan:** Merge PR ke `main`, catat hasil di `docs/results/week2.md`, kunci test set `S07–S10`, tag `v0.1-baseline`. | Lead & Tim |
 
 ---
 
