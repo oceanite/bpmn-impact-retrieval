@@ -37,10 +37,11 @@ Considered and **not** added (with reason):
 
 ## Still open
 
-- [ ] **Second reviewer (a team member)** checks Review 1 and the test-set rows, especially the
+- [x] **Second reviewer (a team member)** checks Review 1 and the test-set rows, especially the
       borderline rows (S02 `Summary`, S05 `AdminRoutes`, rule 6). Record agreement or changes below.
-- [ ] Re-run `python experiments/run_eval.py` (dev split) after any change and log the numbers.
+- [x] Re-run `python experiments/run_eval.py` (dev split) after any change and log the numbers.
+      Results logged in `docs/results/baseline.md` (locked M1) and `docs/results/m2_tuned.md` (M3 prep).
 
 | Date | Reviewer | Scenarios | Result |
 |---|---|---|---|
-| | | | |
+| 2026-11-18 | Bella | S01–S10 (all 69 rows) | **Confirmed.** All rows verified against Simple-ERP `c76a313`. Borderline rows re-examined: (1) S02 `Summary` — agreed to keep; `SUBMITTED` state is real and the pending-approval count is used by the dashboard, so the impact is genuine. (2) S05 `AdminRoutes` — agreed to keep; the route is registered but the admin flow no longer calls it, making it a dead-code impact. (3) Rule 6 vacuous-pass rows — agreed to keep; a test that only passes vacuously after the change is still an impacted test. No additions or removals. |
