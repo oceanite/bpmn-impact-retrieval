@@ -32,8 +32,32 @@ def split_identifier(token: str) -> list[str]:
     return parts
 
 
+def build_synonym_map(groups: Mapping | None) -> dict[str, str]:
+    """``{canonical: [variant, ...]}`` -> ``{variant: canonical}`` (all lowercase).
+
+    Mapping every variant to one canonical word is deterministic and symmetric: query and code
+    go through the same Analyzer, so ``bill`` in a BPMN label and ``Invoice`` in code meet as
+    ``invoice``. A word listed under two canonicals keeps the first (config order).
+    """
+    out: dict[str, str] = {}
+    for canonical, variants in (groups or {}).items():
+        canon = str(canonical).lower()
+        for v in [canonical, *(variants or ())]:
+            out.setdefault(str(v).lower(), canon)
+    return out
+
+
+def build_translation_map(terms: Mapping | None) -> dict[str, tuple[str, ...]]:
+    """``{indonesian: "english words"}`` -> ``{indonesian: ("english", "words")}`` (lowercase)."""
+    return {str(k).lower(): tuple(str(v).lower().split()) for k, v in (terms or {}).items() if v}
+
+
 class Analyzer:
-    """Configurable tokenizer: identifier split -> lowercase -> stopwords -> min length -> stem."""
+    """Configurable tokenizer.
+
+    identifier split -> lowercase -> Indonesian->English -> synonyms -> stopwords -> min length -> stem.
+    Translation and synonyms are off unless ``use_translation`` / ``use_synonyms`` is true.
+    """
 
     def __init__(self, cfg: Mapping | None = None):
         cfg = dict(cfg or {})
@@ -48,6 +72,16 @@ class Analyzer:
                 # str(): unquoted YAML words like true/false/null arrive as bool/None
                 stop |= {str(w).lower() for w in cfg.get(key) or () if w is not None}
         self.stopwords = frozenset(stop)
+        self.translations = build_translation_map(cfg.get("id_en_terms")) if cfg.get("use_translation") else {}
+        self.synonyms = build_synonym_map(cfg.get("synonyms")) if cfg.get("use_synonyms") else {}
+
+    def _normalize(self, token: str) -> list[str]:
+        """Translate and canonicalize one token; may return several words (multi-word translation)."""
+        key = token.lower()
+        words = self.translations.get(key) or (token,)
+        if self.synonyms:
+            words = tuple(self.synonyms.get(w.lower(), w) for w in words)
+        return list(words)
 
     def tokens(self, text: str | None) -> list[str]:
         if not text:
@@ -56,10 +90,11 @@ class Analyzer:
         for word in _WORD.findall(text):
             pieces = split_identifier(word) if self.split_identifiers else [word]
             for piece in pieces:
-                t = piece.lower() if self.lowercase else piece
-                if len(t) < self.min_len or t.isdigit() or t in self.stopwords:
-                    continue
-                out.append(_stem(t) if self.stem else t)
+                piece = piece.lower() if self.lowercase else piece
+                for t in self._normalize(piece) if (self.translations or self.synonyms) else (piece,):
+                    if len(t) < self.min_len or t.isdigit() or t in self.stopwords:
+                        continue
+                    out.append(_stem(t) if self.stem else t)
         return out
 
     def tokens_many(self, texts: Iterable[str]) -> list[str]:

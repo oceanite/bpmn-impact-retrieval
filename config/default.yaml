@@ -47,6 +47,82 @@ preprocessing:
                          per, pun, apa, apakah, bagaimana, kapan, mana, siapa, mengapa, kenapa,
                          bisa, dapat, akan, telah, sudah, belum, tidak, bukan, alur, tahap,
                          langkah, proses, kegiatan, mulai, selesai, aksi, hasil, diterima]
+  # Domain synonyms: every variant is replaced by the canonical word (key) on BOTH sides
+  # (query and code), so "bill" in a BPMN label meets "Invoice" in code (mapping runs before
+  # stopwords, which matters: "bill" is in the English stopword list). Off by default
+  # so the baseline numbers stay the same.
+  use_synonyms: false
+  synonyms:
+    invoice: [bill, billing]
+    confirm: [confirmation, confirmed]
+    approve: [review, approval, approved]
+    supplier: [vendor]
+    customer: [client]
+  # Indonesian -> English business terms (for Indonesian models such as Simple-ERP docs/bpm-haqi).
+  # Applied before stopwords and stemming; a value may hold several English words. Off by default.
+  use_translation: false
+  id_en_terms:
+    pengguna: user
+    penjualan: sales
+    pembelian: purchase
+    stok: inventory
+    persediaan: inventory
+    pesanan: order
+    pemesanan: order
+    pemasok: supplier
+    pelanggan: customer
+    barang: goods
+    gudang: warehouse
+    faktur: invoice
+    tagihan: invoice
+    pembayaran: payment
+    bayar: pay
+    penerimaan: receipt
+    pengiriman: delivery
+    permintaan: request
+    pengadaan: procurement
+    keuangan: finance
+    penyesuaian: adjustment
+    utang: payable
+    hutang: payable
+    piutang: receivable
+    laporan: report
+    pengaturan: settings
+    sesi: session
+    akses: access
+    undangan: invitation
+    sandi: password
+    harga: price
+    jumlah: quantity
+    saldo: balance
+    dokumen: document
+    transaksi: transaction
+    peran: role
+    pemilik: owner
+    buat: create
+    batalkan: cancel
+    batal: cancel
+    catat: record
+    baca: read
+    ubah: update
+    hapus: delete
+    simpan: save
+    kirim: send
+    setujui: approve
+    tolak: reject
+    ditolak: rejected
+    tinjau: review
+    periksa: check
+    cek: check
+    cabut: revoke
+    aktifkan: activate
+    aktivasi: activation
+    nonaktifkan: deactivate
+    validasi: validation
+    hitung: count
+    kebutuhan: requirement
+    konfigurasi: configuration
+    pengendalian: control
 
 query:
   drop_ids: true            # remove BPMN trace ids like SAL-SO-001 from query text
@@ -58,6 +134,8 @@ query:
     flow_endpoint: 0.3
     lane: 0.2
     process: 0.1
+    task_context: 0.3       # names of predecessor/successor nodes of a changed task (PIC suggestion)
+  task_context_flow_types: [sequenceFlow]   # flows followed to find a task's neighbours
 
 retrieval:
   method: bm25              # bm25 | keyword | tfidf

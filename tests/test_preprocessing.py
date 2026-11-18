@@ -58,3 +58,67 @@ def test_plain_words_is_grep_like():
     # lowercase, split on punctuation, English stopwords ("the", "to") removed, no stemming
     assert plain_words("Confirm the Order-to-Cash orders!") == ["confirm", "order", "cash", "orders"]
     assert plain_words("MatchSupplierInvoice") == ["matchsupplierinvoice"]   # no identifier split
+
+
+# --- domain synonyms and Indonesian -> English terms (both off by default) ------------------
+
+SYN = {"invoice": ["bill"], "confirm": ["confirmation"], "approve": ["review"]}
+ID_EN = {"pengguna": "user", "penjualan": "sales", "pesanan": "order", "stok": "inventory",
+         "kata": "pass word"}
+
+
+def test_synonyms_off_by_default():
+    a = Analyzer({"stemming": "none", "synonyms": SYN})          # use_synonyms missing -> off
+    assert a.tokens("review confirmation") == ["review", "confirmation"]
+    assert a.tokens("bill") == []        # "bill" is a scikit-learn English stopword ...
+
+
+def test_synonyms_map_variants_to_canonical_on_both_sides():
+    a = Analyzer({"stemming": "porter", "use_synonyms": True, "synonyms": SYN})
+    assert a.tokens("Send bill") == a.tokens("SendInvoice") == ["send", "invoic"]   # ... unless mapped first
+    assert a.tokens("Order confirmation") == ["order", "confirm"]
+    assert a.tokens("reviewOrder") == ["approv", "order"]
+
+
+def test_synonyms_first_canonical_wins_and_handles_yaml_values():
+    from impact_retrieval.preprocessing.text import build_synonym_map
+    m = build_synonym_map({"invoice": ["Bill"], "payment": ["bill", True]})
+    assert m["bill"] == "invoice" and m["payment"] == "payment" and m["true"] == "payment"
+    assert build_synonym_map(None) == {}
+
+
+def test_translation_off_by_default():
+    a = Analyzer({"stemming": "none", "id_en_terms": ID_EN})
+    assert a.tokens("pesanan penjualan") == ["pesanan", "penjualan"]
+
+
+def test_translation_indonesian_to_english():
+    a = Analyzer({"stemming": "none", "use_translation": True, "id_en_terms": ID_EN,
+                  "indonesian_stopwords": ["dan"]})
+    assert a.tokens("Akses dan pengguna") == ["akses", "user"]
+    assert a.tokens("Pesanan Penjualan; cek stok") == ["order", "sales", "cek", "inventory"]
+    assert a.tokens("kata") == ["pass", "word"]                  # multi-word translation
+
+
+def test_translation_meets_english_code():
+    a = Analyzer({"stemming": "porter", "use_translation": True, "id_en_terms": ID_EN})
+    assert set(a.tokens("Buat pesanan penjualan")) & set(a.tokens("CreateSalesOrder")) == {"order", "sale"}
+
+
+def test_translation_then_synonyms_then_stopwords():
+    a = Analyzer({"stemming": "none", "use_translation": True, "use_synonyms": True,
+                  "id_en_terms": {"tagihan": "bill", "dan": "and"}, "synonyms": {"invoice": ["bill"]}})
+    assert a.tokens("tagihan dan") == ["invoice"]                 # "and" is an English stopword
+
+
+def test_default_config_keeps_baseline_and_has_dictionaries():
+    from pathlib import Path
+    import yaml
+    cfg = yaml.safe_load((Path(__file__).resolve().parent.parent / "config" / "default.yaml").read_text("utf-8"))
+    pre = cfg["preprocessing"]
+    assert pre["use_synonyms"] is False and pre["use_translation"] is False
+    for word, english in {"pengguna": "user", "penjualan": "sales", "pembelian": "purchase",
+                          "stok": "inventory", "pesanan": "order"}.items():
+        assert pre["id_en_terms"][word] == english
+    on = Analyzer({**pre, "use_translation": True, "use_synonyms": True})
+    assert on.tokens("Akses dan pengguna") == ["access", "user"]
