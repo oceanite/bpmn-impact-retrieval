@@ -141,8 +141,8 @@ retrieval:
   method: bm25              # bm25 | keyword | tfidf
   top_k: 10
   bm25:
-    k1: 1.5
-    b: 0.75
+    k1: 0.9   # tuned M2 via LOSO (baseline M1: 1.5)
+    b: 0.5    # tuned M2 via LOSO (baseline M1: 0.75)
   tfidf:
     sublinear_tf: true
   # Multiplier applied per document field (BM25 only)

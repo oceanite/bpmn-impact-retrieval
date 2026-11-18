@@ -4,7 +4,7 @@
 **Status:** Aktif  
 **Split Data:** Development Set (`S01`–`S06`), 50 baris *ground truth*  
 **Basis Kode Target:** Simple-ERP (Go, TypeScript, SQL, OpenAPI)  
-**Konfigurasi:** `config/default.yaml` — BM25 `k1=0.5`, `b=1.0` (hasil tuning dari `experiments/tune.py`)  
+**Konfigurasi:** `config/default.yaml` — BM25 `k1=0.9`, `b=0.5` (hasil LOSO tuning dari `experiments/tune.py`)  
 **Dibandingkan dengan:** [`docs/results/baseline.md`](baseline.md) (`k1=1.5`, `b=0.75`)
 
 ---
@@ -13,10 +13,10 @@
 
 | Parameter | Baseline (M1) | Tuned (M2) |
 |---|---|---|
-| `k1` | 1.5 | **0.5** |
-| `b` | 0.75 | **1.0** |
+| `k1` | 1.5 | **0.9** |
+| `b` | 0.75 | **0.5** |
 
-Nilai diperoleh dengan grid-search 45 kombinasi (`k1` ∈ {0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0}, `b` ∈ {0.0, 0.25, 0.5, 0.75, 1.0}) menggunakan `python experiments/tune.py`. Target optimasi: F1@5 (file level, dev set).
+Nilai diperoleh dengan **Leave-One-Scenario-Out (LOSO)** grid-search: grid `k1` ∈ {0.9, 1.2, 1.5, 2.0}, `b` ∈ {0.3, 0.5, 0.75, 1.0} (16 kombinasi × 6 folds). Setiap skenario dijadikan held-out sekali; metrik yang dilaporkan adalah rata-rata dari 6 held-out score. Target optimasi: F1@5 (file level).
 
 ---
 
