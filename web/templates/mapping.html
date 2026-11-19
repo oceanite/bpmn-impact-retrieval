@@ -12,10 +12,10 @@
           {% for s in scenarios %}<option {% if s == selected.scenario %}selected{% endif %}>{{ s }}</option>{% endfor %}
         </select>
       </label>
-      <label>Old BPMN <input type="file" name="old_file" accept=".bpmn,.xml"></label>
-      <label>New BPMN <input type="file" name="new_file" accept=".bpmn,.xml"></label>
+      <label>Old BPMN <input type="file" name="old_file" accept=".bpmn,.xml"><small>Max {{ upload_limits.max_bpmn_mb }} MB</small></label>
+      <label>New BPMN <input type="file" name="new_file" accept=".bpmn,.xml"><small>Max {{ upload_limits.max_bpmn_mb }} MB</small></label>
       <label>Source code ZIP (optional, default: Simple-ERP)
-        <input type="file" name="code_zip" accept=".zip"></label>
+        <input type="file" name="code_zip" accept=".zip"><small>Max {{ upload_limits.max_zip_mb }} MB (compressed)</small></label>
       <label>Method
         <select name="method">
           {% for m in methods %}<option {% if m == selected.method %}selected{% endif %}>{{ m }}</option>{% endfor %}
@@ -23,6 +23,12 @@
       </label>
       <button type="submit">Find impacted code</button>
     </div>
+    {% if report %}
+      <p>
+        <button type="submit" formaction="/download/csv">Download Report (CSV)</button>
+        <button type="submit" formaction="/download/json">Download Report (JSON)</button>
+      </p>
+      {% endif %}
     {% with show_top_k=True %}{% include "_settings.html" %}{% endwith %}
   </form>
   {% if error %}<p class="error">{{ error }}</p>{% endif %}
@@ -30,19 +36,43 @@
 
 {% if report %}
 <section>
-  <h2>2. Detected changes ({{ report.changes|length }})</h2>
+  <style>
+  tr.chg-added    { background: rgba(46,125,50,.12); }
+  tr.chg-removed  { background: rgba(198,40,40,.12); }
+  tr.chg-modified { background: rgba(249,168,37,.15); }
+  tr.chg-added td:first-child    { border-left: 4px solid #2e7d32; }
+  tr.chg-removed td:first-child  { border-left: 4px solid #c62828; }
+  tr.chg-modified td:first-child { border-left: 4px solid #f9a825; }
+</style>
+{% macro change_row(c) %}
+<tr class="chg-{{ c.change_type.value }}">
+  <td>{{ c.change_type.value }}</td>
+  <td><code>{{ c.element_id }}</code></td>
+  <td>{{ c.element.type }}</td>
+  <td>{{ c.element.name }}</td>
+  <td>{% for f in c.fields %}<span class="tag">{{ f.field }}: {{ f.old }} → {{ f.new }}</span>{% endfor %}</td>
+</tr>
+{% endmacro %}
+{% macro change_head() %}<tr><th>Change</th><th>Element</th><th>Type</th><th>Name</th><th>Changed fields</th></tr>{% endmacro %}
+
+<h2>2. Detected changes ({{ report.changes|length }})</h2>
+{% for g in group_changes(report.changes) %}
+<h3>{{ g.title }} ({{ g.shown|length + g.hidden|length }})</h3>
+{% if g.shown %}
+<div class="table-wrap"><table>
+  {{ change_head() }}
+  {% for c in g.shown %}{{ change_row(c) }}{% endfor %}
+</table></div>
+{% endif %}
+{% if g.hidden %}
+<details><summary>{{ g.hidden|length }} unnamed sequence flow(s), hidden</summary>
   <div class="table-wrap"><table>
-    <tr><th>Change</th><th>Element</th><th>Type</th><th>Name</th><th>Changed fields</th></tr>
-    {% for c in report.changes %}
-    <tr>
-      <td class="{{ c.change_type.value }}">{{ c.change_type.value }}</td>
-      <td><code>{{ c.element_id }}</code></td>
-      <td>{{ c.element.type }}</td>
-      <td>{{ c.element.name }}</td>
-      <td>{% for f in c.fields %}<span class="tag">{{ f.field }}: {{ f.old }} → {{ f.new }}</span>{% endfor %}</td>
-    </tr>
-    {% endfor %}
+    {{ change_head() }}
+    {% for c in g.hidden %}{{ change_row(c) }}{% endfor %}
   </table></div>
+</details>
+{% endif %}
+{% else %}<p>No changes detected.</p>{% endfor %}
   <details><summary>Query sent to retrieval ({{ report.query.parts|length }} parts)</summary>
     {% for p in report.query.parts %}<span class="tag">{{ p.text }} · {{ p.role }} ×{{ p.weight }}</span>{% endfor %}
   </details>
