@@ -40,13 +40,13 @@ All quantitative evaluations were conducted exclusively on the **Development Set
 
 ### Full Decomposition Table (File Level, Mean over Dev Set)
 
-| Stage | Configuration | P@5 | R@5 | F1@5 | R@10 | F1@10 | MRR | Latency | Key Takeaway |
-|---|---|---|---|---|---|---|---|---|---|
-| **1. Baseline (M1)** | `k1=1.5, b=0.75`, No Task Context | 0.733 | 0.667 | **0.657** | 0.932 | 0.664 | **1.000** | 4.7 ms | Official locked benchmark (`v0.1-baseline`) |
-| **2. + Person 2 (Query)** | `k1=1.5, b=0.75`, + Task Context 0.3 | 0.767 | 0.690 | **0.685** | 0.911 | 0.645 | **1.000** | 5.0 ms | **+2.8pp F1@5** pure query contribution |
-| **3. + Person 3 (Tuning)** | `k1=0.5, b=1.0`, + Task Context 0.3 | **0.833** | **0.756** | **0.750** | **0.932** | **0.664** | **1.000** | 5.1 ms | **+9.3pp F1@5 total gain** via length normalization |
-| **4. + Dictionaries (All)** | Tuned + TC + Synonyms + ID $\rightarrow$ EN | 0.767 | 0.732 | **0.722** | 0.932 | 0.664 | 1.000 | 5.3 ms | Drop due to `approve ↔ review` synonym clash in S06 |
-| **5. + ID $\rightarrow$ EN Only** | Tuned + TC + ID $\rightarrow$ EN Translation | **0.833** | **0.756** | **0.750** | **0.932** | **0.664** | **1.000** | 5.1 ms | **Zero regression** on English dev set |
+| Stage | Configuration | P@5 | R@5 | F1@5 | R@10 | F1@10 | Latency | Key Takeaway |
+|---|---|---|---|---|---|---|---|---|
+| **1. Baseline (M1)** | `k1=1.5, b=0.75`, No Task Context | 0.733 | 0.667 | **0.657** | 0.932 | 0.664 | 4.7 ms | Official locked benchmark (`v0.1-baseline`) |
+| **2. + Person 2 (Query)** | `k1=1.5, b=0.75`, + Task Context 0.3 | 0.767 | 0.690 | **0.685** | 0.911 | 0.645 | 5.0 ms | **+2.8pp F1@5** pure query contribution |
+| **3. + Person 3 (Tuning)** | `k1=0.5, b=1.0`, + Task Context 0.3 | **0.833** | **0.756** | **0.750** | **0.932** | **0.664** | 5.1 ms | **+9.3pp F1@5 total gain** via length normalization |
+| **4. + Dictionaries (All)** | Tuned + TC + Synonyms + ID $\rightarrow$ EN | 0.767 | 0.732 | **0.722** | 0.932 | 0.664 | 5.3 ms | Drop due to `approve ↔ review` synonym clash in S06 |
+| **5. + ID $\rightarrow$ EN Only** | Tuned + TC + ID $\rightarrow$ EN Translation | **0.833** | **0.756** | **0.750** | **0.932** | **0.664** | 5.1 ms | **Zero regression** on English dev set |
 
 ---
 
