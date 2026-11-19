@@ -1,5 +1,7 @@
 """Website smoke tests (run against the real Simple-ERP clone; skipped if it is missing)."""
 import pytest
+import csv
+import io
 
 from conftest import FIXTURES, REPO_ROOT
 
@@ -85,3 +87,38 @@ def test_api():
     r = client.get("/api/scenarios/S01?k=3")
     assert r.status_code == 200 and len(r.json()["results"]) == 3
     assert client.get("/api/scenarios/S99").status_code == 404
+
+CSV_HEADER = "scenario_id,file_path,function,score,matched_terms"
+
+
+def test_mapping_page_has_download_buttons():
+    r = client.post("/", data={"scenario": "S03", "method": "bm25"})
+    assert "/download/csv" in r.text and "/download/json" in r.text
+
+
+def test_download_json():
+    r = client.post("/download/json", data={"scenario": "S03", "method": "bm25"})
+    assert r.status_code == 200 and r.headers["content-type"].startswith("application/json")
+    assert "attachment" in r.headers["content-disposition"]
+    body = r.json()
+    assert body["method"] == "bm25" and body["results"]
+
+
+def test_download_csv():
+    r = client.post("/download/csv", data={"scenario": "S03", "method": "bm25"})
+    assert r.status_code == 200 and r.headers["content-type"].startswith("text/csv")
+    assert r.text.splitlines()[0] == CSV_HEADER
+    rows = list(csv.DictReader(io.StringIO(r.text)))
+    assert rows and all(row["scenario_id"] == "S03" for row in rows)
+
+
+def test_download_csv_from_upload_has_empty_scenario_id():
+    r = client.post("/download/csv", data={"method": "keyword"},
+                    files={"old_file": ("old.bpmn", OLD), "new_file": ("new.bpmn", NEW)})
+    assert r.status_code == 200 and r.text.splitlines()[0] == CSV_HEADER
+    assert all(row["scenario_id"] == "" for row in csv.DictReader(io.StringIO(r.text)))
+
+
+def test_download_without_input_is_400():
+    assert client.post("/download/csv", data={"method": "bm25"}).status_code == 400
+    assert client.post("/download/json", data={"method": "bm25"}).status_code == 400

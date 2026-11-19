@@ -7,6 +7,10 @@ then open http://127.0.0.1:8000
 from __future__ import annotations
 
 import sys
+import csv
+import io
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from pathlib import Path
 from typing import Any
 
@@ -90,15 +94,11 @@ def mapping_form(request: Request):
         "settings": _settings_context(DEFAULTS), "fields": FIELDS})
 
 
-@app.post("/", response_class=HTMLResponse)
-async def mapping_run(request: Request, scenario: str = Form(""), method: str = Form("bm25"),
-                      old_file: UploadFile | None = File(None), new_file: UploadFile | None = File(None),
-                      code_zip: UploadFile | None = File(None),
-                      k1: float | None = Form(None), b: float | None = Form(None), top_k: int | None = Form(None)):
-    form = dict(await request.form())
-    cfg = load_config(overrides=_overrides(k1, b, top_k, _weights_from(form)))
+async def _run_report(cfg: dict, scenario: str, method: str, old_file: UploadFile | None,
+                      new_file: UploadFile | None, code_zip: UploadFile | None):
+    """Shared by the mapping page and the downloads. Returns (report, error, scenario_id)."""
     limits = cfg.get("upload", {})
-    report, error = None, None
+    report, error, scenario_id = None, None, ""
     try:
         zip_bytes = await _read_upload(code_zip, int(limits.get("max_zip_mb", 50)))
         pipe = (ImpactPipeline.from_zip(zip_bytes, cfg, label=code_zip.filename) if zip_bytes
@@ -109,10 +109,22 @@ async def mapping_run(request: Request, scenario: str = Form(""), method: str = 
             report = pipe.run(old_bytes, new_bytes, method=method)
         elif scenario:
             report = pipe.run_scenario(scenario, method=method)
+            scenario_id = scenario
         else:
             error = "Choose a scenario or upload both an old and a new BPMN file."
     except (BpmnParseError, FileNotFoundError, ValueError) as exc:   # ArchiveError is a ValueError
         error = str(exc)
+    return report, error, scenario_id
+
+
+@app.post("/", response_class=HTMLResponse)
+async def mapping_run(request: Request, scenario: str = Form(""), method: str = Form("bm25"),
+                      old_file: UploadFile | None = File(None), new_file: UploadFile | None = File(None),
+                      code_zip: UploadFile | None = File(None),
+                      k1: float | None = Form(None), b: float | None = Form(None), top_k: int | None = Form(None)):
+    form = dict(await request.form())
+    cfg = load_config(overrides=_overrides(k1, b, top_k, _weights_from(form)))
+    report, error, _ = await _run_report(cfg, scenario, method, old_file, new_file, code_zip)
     return templates.TemplateResponse(request, "mapping.html", {
         "scenarios": ImpactPipeline(cfg=cfg).scenarios(), "methods": METHODS, "report": report, "error": error,
         "selected": {"scenario": scenario, "method": method},
@@ -128,6 +140,44 @@ async def _read_upload(upload: UploadFile | None, max_mb: int) -> bytes | None:
         raise ValueError(f"{upload.filename} is larger than {max_mb} MB")
     return data or None
 
+# --------------------------------------------------------------------------- downloads
+
+def _attachment(filename: str) -> dict[str, str]:
+    return {"Content-Disposition": f'attachment; filename="{filename}"'}
+
+
+async def _report_for_download(request, scenario, method, old_file, new_file, code_zip, k1, b, top_k):
+    form = dict(await request.form())
+    cfg = load_config(overrides=_overrides(k1, b, top_k, _weights_from(form)))
+    report, error, scenario_id = await _run_report(cfg, scenario, method, old_file, new_file, code_zip)
+    if error:
+        raise HTTPException(400, error)
+    return report, scenario_id
+
+
+@app.post("/download/json")
+async def download_json(request: Request, scenario: str = Form(""), method: str = Form("bm25"),
+                        old_file: UploadFile | None = File(None), new_file: UploadFile | None = File(None),
+                        code_zip: UploadFile | None = File(None),
+                        k1: float | None = Form(None), b: float | None = Form(None), top_k: int | None = Form(None)):
+    report, _ = await _report_for_download(request, scenario, method, old_file, new_file, code_zip, k1, b, top_k)
+    return JSONResponse(jsonable_encoder(report.to_dict()), headers=_attachment("impact_report.json"))
+
+
+@app.post("/download/csv")
+async def download_csv(request: Request, scenario: str = Form(""), method: str = Form("bm25"),
+                       old_file: UploadFile | None = File(None), new_file: UploadFile | None = File(None),
+                       code_zip: UploadFile | None = File(None),
+                       k1: float | None = Form(None), b: float | None = Form(None), top_k: int | None = Form(None)):
+    report, scenario_id = await _report_for_download(request, scenario, method, old_file, new_file,
+                                                     code_zip, k1, b, top_k)
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["scenario_id", "file_path", "function", "score", "matched_terms"])
+    for r in report.results:
+        terms = ";".join(dict.fromkeys(e.term for e in r.evidence))   # unique, keeps order
+        writer.writerow([scenario_id, r.document.path, r.document.function, f"{r.score:.6f}", terms])
+    return Response(buf.getvalue(), media_type="text/csv", headers=_attachment("impact_report.csv"))
 
 # --------------------------------------------------------------------------- evaluation page
 

@@ -23,6 +23,12 @@
       </label>
       <button type="submit">Find impacted code</button>
     </div>
+    {% if report %}
+      <p>
+        <button type="submit" formaction="/download/csv">Download Report (CSV)</button>
+        <button type="submit" formaction="/download/json">Download Report (JSON)</button>
+      </p>
+      {% endif %}
     {% with show_top_k=True %}{% include "_settings.html" %}{% endwith %}
   </form>
   {% if error %}<p class="error">{{ error }}</p>{% endif %}
