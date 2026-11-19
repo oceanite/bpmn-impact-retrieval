@@ -1,4 +1,4 @@
-# BPMN Change Impact Retrieval — Kemajuan Mingguan
+# BPMN Change Impact Retrieval — Progress Mingguan
 **Kelompok:** 9  
 **Tanggal:** 19 November 2026  
 **Target Milestone:** Milestone M2 (Penyempurnaan Query, Test Set Dibekukan, & Penyempurnaan Web UI)  
