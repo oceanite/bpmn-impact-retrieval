@@ -51,7 +51,7 @@ def group_changes(changes) -> list[dict]:
         groups[title]["hidden" if unnamed_flow else "shown"].append(c)
     return [g for g in groups.values() if g["shown"] or g["hidden"]]
 
-
+templates.env.globals["upload_limits"] = DEFAULTS.get("upload", {})
 templates.env.globals["group_changes"] = group_changes
 
 

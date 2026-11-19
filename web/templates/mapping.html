@@ -12,10 +12,10 @@
           {% for s in scenarios %}<option {% if s == selected.scenario %}selected{% endif %}>{{ s }}</option>{% endfor %}
         </select>
       </label>
-      <label>Old BPMN <input type="file" name="old_file" accept=".bpmn,.xml"></label>
-      <label>New BPMN <input type="file" name="new_file" accept=".bpmn,.xml"></label>
+      <label>Old BPMN <input type="file" name="old_file" accept=".bpmn,.xml"><small>Max {{ upload_limits.max_bpmn_mb }} MB</small></label>
+      <label>New BPMN <input type="file" name="new_file" accept=".bpmn,.xml"><small>Max {{ upload_limits.max_bpmn_mb }} MB</small></label>
       <label>Source code ZIP (optional, default: Simple-ERP)
-        <input type="file" name="code_zip" accept=".zip"></label>
+        <input type="file" name="code_zip" accept=".zip"><small>Max {{ upload_limits.max_zip_mb }} MB (compressed)</small></label>
       <label>Method
         <select name="method">
           {% for m in methods %}<option {% if m == selected.method %}selected{% endif %}>{{ m }}</option>{% endfor %}
