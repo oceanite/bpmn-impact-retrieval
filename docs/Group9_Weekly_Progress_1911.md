@@ -1,5 +1,5 @@
-# BPMN Change Impact Retrieval — Weekly Progress (Week 2)
-**Group:** 9 · Software Engineering (Semester 7)  
+# BPMN Change Impact Retrieval — Weekly Progress
+**Group:** 9 
 **Date:** 19 November 2026  
 **Target Milestone:** Milestone M2 (Query Enhancements, Frozen Test Set, & Web UI Polish)  
 **Repository Status:** 100% CI pass rate (136 unit tests) · All 6 PRs merged into `main` · Live web dashboard active  
