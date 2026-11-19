@@ -27,6 +27,28 @@ from impact_retrieval.types import FIELDS  # noqa: E402
 app = FastAPI(title="BPMN Change Impact Retrieval")
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 DEFAULTS = load_config()
+def group_changes(changes) -> list[dict]:
+    """Group BPMN changes by element kind. Unnamed sequence flows go to `hidden` (collapsed in the UI)."""
+    groups = {t: {"title": t, "shown": [], "hidden": []}
+              for t in ("Activities / Tasks", "Gateways", "Events", "Sequence Flows", "Other")}
+    for c in changes:
+        kind = (c.element.type or "").split(":")[-1].lower()
+        if kind.endswith("flow"):
+            title = "Sequence Flows"
+        elif kind.endswith("gateway"):
+            title = "Gateways"
+        elif kind.endswith("event"):
+            title = "Events"
+        elif kind.endswith(("task", "activity", "subprocess")):
+            title = "Activities / Tasks"
+        else:
+            title = "Other"
+        unnamed_flow = title == "Sequence Flows" and not (c.element.name or "").strip()
+        groups[title]["hidden" if unnamed_flow else "shown"].append(c)
+    return [g for g in groups.values() if g["shown"] or g["hidden"]]
+
+
+templates.env.globals["group_changes"] = group_changes
 
 
 def _overrides(k1: float | None, b: float | None, top_k: int | None, weights: dict[str, float]) -> dict:
