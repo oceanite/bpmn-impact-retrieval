@@ -2,50 +2,88 @@
 {% block title %}Mapping · BPMN Impact Retrieval{% endblock %}
 {% block nav_map %}active{% endblock %}
 {% block content %}
+<div class="page-head">
+  <h1>Find code impacted by a BPMN change</h1>
+  <p>Compare two BPMN versions, then rank the source files most likely to need changes.</p>
+  <ol class="steps" id="steps">
+    <li class="step"><span class="step-num">1</span>Choose input</li>
+    <li class="step"><span class="step-num">2</span>Run method</li>
+    <li class="step"><span class="step-num">3</span>Review ranked files</li>
+  </ol>
+</div>
 <section>
-  <h2>1. Choose BPMN versions</h2>
+  <!-- <h2>1. Choose BPMN versions</h2> -->
   <form method="post" enctype="multipart/form-data">
-    <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end">
-      <label>Scenario
-        <select name="scenario">
-          <option value="">(upload instead)</option>
-          {% for s in scenarios %}<option {% if s == selected.scenario %}selected{% endif %}>{{ s }}</option>{% endfor %}
-        </select>
-        <small>&nbsp;</small>
-      </label>
+    <div class="grid">
+      <div class="span-all scn-row">
+        <label class="scn-select">Scenario
+          <select name="scenario">
+            <option value="">Select a scenario</option>
+            {% for s in scenarios %}<option {% if s == selected.scenario %}selected{% endif %}>{{ s }}</option>{% endfor %}
+          </select>
+        </label>
+        <span class="scn-or">or upload your own files</span>
+      </div>
       <label>Old BPMN
-        <input type="file" name="old_file" accept=".bpmn,.xml" data-scn-file="old.bpmn">
+        <span class="file-box"><input type="file" name="old_file" accept=".bpmn,.xml" data-scn-file="old.bpmn"></span>
         <span class="scn-file" data-scn-file="old.bpmn" style="display:none"></span>
         <small>Max {{ upload_limits.max_bpmn_mb }} MB</small></label>
       <label>New BPMN
-        <input type="file" name="new_file" accept=".bpmn,.xml" data-scn-file="new.bpmn">
+        <span class="file-box"><input type="file" name="new_file" accept=".bpmn,.xml" data-scn-file="new.bpmn"></span>
         <span class="scn-file" data-scn-file="new.bpmn" style="display:none"></span>
         <small>Max {{ upload_limits.max_bpmn_mb }} MB</small></label>
       <label>Source code ZIP (optional, default: Simple-ERP)
-        <input type="file" name="code_zip" accept=".zip"><small>Max {{ upload_limits.max_zip_mb }} MB (compressed)</small></label>
-      <label>Method
+        <span class="file-box"><input type="file" name="code_zip" accept=".zip"></span>
+        <small>Max {{ upload_limits.max_zip_mb }} MB (compressed)</small></label>
+      <label class="col-1">Method
         <select name="method">
           {% for m in methods %}<option {% if m == selected.method %}selected{% endif %}>{{ m }}</option>{% endfor %}
         </select>
-        <small>&nbsp;</small>
       </label>
-      <button type="submit">Find impacted code</button>
-    </div>
-    {% if report %}
-      <p>
+      <button type="submit" class="col-1">Find impacted code</button>
+      {% if report %}
+      <div class="col-1 dl-row">
         <button type="submit" formaction="/download/csv">Download Report (CSV)</button>
         <button type="submit" formaction="/download/json">Download Report (JSON)</button>
-      </p>
+      </div>
       {% endif %}
+    </div>
     {% with show_top_k=True %}{% include "_settings.html" %}{% endwith %}
   </form>
     <style>
-    .grid select, .grid input[type=file], .scn-file {
-      box-sizing: border-box; height: 40px;
-    }
-    .scn-file { padding: 9px 10px; line-height: 20px; border: 1px solid #d0d7de; border-radius: 6px;
-                background: #f6f8fa; font-family: monospace; font-size: .9em;
-                overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .page-head h1 { font-size: 26px; margin: 0 0 4px; }
+      .page-head p { margin: 0 0 16px; color: var(--muted); font-size: 15px; }
+      .steps { display: flex; flex-wrap: wrap; gap: 16px; list-style: none; padding: 0; margin: 0 0 20px; }
+      .step { display: flex; align-items: center; gap: 8px; color: var(--muted); font-weight: 600; transition: color .3s; }
+      .step-num { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #c3c9d6; background: #fff;
+                  display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all .3s; }
+      .step.lit { color: var(--ink); }
+      .step.lit .step-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+      .dl-row { display: flex; gap: 8px; }
+      .dl-row button { flex: 1 1 0; min-width: 0; padding: 8px 6px; font-size: 13px; }  
+      .grid select, .scn-file { box-sizing: border-box; height: 40px; }
+      .scn-file { padding: 9px 10px; line-height: 20px; border: 1px solid #d0d7de; border-radius: 6px;
+                  background: #f6f8fa; font-family: monospace; font-size: .9em;
+                  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .file-box { display: flex; align-items: center; justify-content: flex-start; box-sizing: border-box;
+                  height: 40px; padding: 0 8px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+      .file-box input[type=file] { border: 0; padding: 0 4px; margin: 0; height: auto; width: 100%; background: transparent; }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start; }
+      .grid .span-all { grid-column: 1 / -1; }
+      .grid .col-1 { grid-column: 1; }
+      @media (max-width: 700px) {
+        .grid { grid-template-columns: 1fr; }
+        .grid .span-all, .grid .col-1 { grid-column: auto; }
+      }
+      .scn-row { display: flex; align-items: flex-end; gap: 16px; }
+      .scn-select { flex: 1; }
+      .scn-or { color: var(--muted); white-space: nowrap; line-height: 40px; }
+      select.is-empty { color: var(--muted); }
+      select.is-empty option { color: var(--ink); }
+      @media (max-width: 700px) {
+        .scn-row { flex-direction: column; align-items: stretch; gap: 4px; }
+        .scn-or { line-height: 1.5; }
+      }
     </style>
   <script>
   (function () {
@@ -53,10 +91,11 @@
     var inputs = document.querySelectorAll('input[data-scn-file]');
     var names = document.querySelectorAll('span.scn-file');
     function sync() {
+      sel.classList.toggle('is-empty', !sel.value);
       var s = sel.value;
       inputs.forEach(function (inp) {
         if (s) inp.value = '';                 // drop any chosen upload so it can't override the scenario
-        inp.style.display = s ? 'none' : '';
+        inp.closest('.file-box').style.display = s ? 'none' : '';
       });
       names.forEach(function (el) {
         el.textContent = s ? s + '/' + el.dataset.scnFile : '';
@@ -65,6 +104,24 @@
     }
     sel.addEventListener('change', sync);
     sync();                                    // also runs on page load, after a POST
+  })();
+  </script>
+  <script>
+  (function () {
+    var form = document.querySelector('form');
+    var sel = form.querySelector('select[name="scenario"]');
+    var oldF = form.querySelector('input[name="old_file"]');
+    var newF = form.querySelector('input[name="new_file"]');
+    var steps = document.querySelectorAll('#steps .step');
+    var reportShown = {{ 'true' if report else 'false' }};
+
+    function update() {
+      var hasInput = !!sel.value || (oldF.files.length > 0 && newF.files.length > 0);
+      var lit = reportShown ? 3 : (hasInput ? 2 : 1);
+      steps.forEach(function (li, i) { li.classList.toggle('lit', i < lit); });
+    }
+    form.addEventListener('change', function () { reportShown = false; update(); });
+    update();
   })();
   </script>
   {% if error %}<p class="error">{{ error }}</p>{% endif %}
