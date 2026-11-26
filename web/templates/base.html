@@ -8,8 +8,8 @@
     :root { --ink:#1d2433; --muted:#5d6678; --line:#d9dde5; --bg:#f6f7f9; --accent:#2457c5; --ok:#1f7a45; --bad:#b3261e; }
     * { box-sizing: border-box; }
     body { margin:0; font:14px/1.5 system-ui, sans-serif; color:var(--ink); background:var(--bg); }
-    header { background:#fff; border-bottom:1px solid var(--line); padding:12px 24px; display:flex; gap:24px; align-items:center; flex-wrap:wrap; }
-    header strong { font-size:16px; }
+    header { background:#fff; border-bottom:1px solid var(--line); padding:12px 24px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; }
+    header nav { display:flex; gap:24px; justify-content:center; }    header strong { font-size:16px; }
     header a { color:var(--muted); text-decoration:none; } header a.active { color:var(--accent); font-weight:600; }
     main { max-width:1200px; margin:0 auto; padding:24px; }
     section { background:#fff; border:1px solid var(--line); border-radius:8px; padding:16px 20px; margin-bottom:20px; }
@@ -35,8 +35,10 @@
 <body>
   <header>
     <strong>BPMN Change Impact Retrieval</strong>
-    <a href="/" class="{% block nav_map %}{% endblock %}">Mapping</a>
-    <a href="/evaluation" class="{% block nav_eval %}{% endblock %}">Evaluation</a>
+    <nav>
+      <a href="/" class="{% block nav_map %}{% endblock %}">Mapping</a>
+      <a href="/evaluation" class="{% block nav_eval %}{% endblock %}">Evaluation</a>
+    </nav>
   </header>
   <main>{% block content %}{% endblock %}</main>
 </body>
