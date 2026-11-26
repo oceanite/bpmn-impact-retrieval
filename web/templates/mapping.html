@@ -11,15 +11,23 @@
           <option value="">(upload instead)</option>
           {% for s in scenarios %}<option {% if s == selected.scenario %}selected{% endif %}>{{ s }}</option>{% endfor %}
         </select>
+        <small>&nbsp;</small>
       </label>
-      <label>Old BPMN <input type="file" name="old_file" accept=".bpmn,.xml"><small>Max {{ upload_limits.max_bpmn_mb }} MB</small></label>
-      <label>New BPMN <input type="file" name="new_file" accept=".bpmn,.xml"><small>Max {{ upload_limits.max_bpmn_mb }} MB</small></label>
+      <label>Old BPMN
+        <input type="file" name="old_file" accept=".bpmn,.xml" data-scn-file="old.bpmn">
+        <span class="scn-file" data-scn-file="old.bpmn" style="display:none"></span>
+        <small>Max {{ upload_limits.max_bpmn_mb }} MB</small></label>
+      <label>New BPMN
+        <input type="file" name="new_file" accept=".bpmn,.xml" data-scn-file="new.bpmn">
+        <span class="scn-file" data-scn-file="new.bpmn" style="display:none"></span>
+        <small>Max {{ upload_limits.max_bpmn_mb }} MB</small></label>
       <label>Source code ZIP (optional, default: Simple-ERP)
         <input type="file" name="code_zip" accept=".zip"><small>Max {{ upload_limits.max_zip_mb }} MB (compressed)</small></label>
       <label>Method
         <select name="method">
           {% for m in methods %}<option {% if m == selected.method %}selected{% endif %}>{{ m }}</option>{% endfor %}
         </select>
+        <small>&nbsp;</small>
       </label>
       <button type="submit">Find impacted code</button>
     </div>
@@ -31,6 +39,34 @@
       {% endif %}
     {% with show_top_k=True %}{% include "_settings.html" %}{% endwith %}
   </form>
+    <style>
+    .grid select, .grid input[type=file], .scn-file {
+      box-sizing: border-box; height: 40px;
+    }
+    .scn-file { padding: 9px 10px; line-height: 20px; border: 1px solid #d0d7de; border-radius: 6px;
+                background: #f6f8fa; font-family: monospace; font-size: .9em;
+                overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    </style>
+  <script>
+  (function () {
+    var sel = document.querySelector('select[name="scenario"]');
+    var inputs = document.querySelectorAll('input[data-scn-file]');
+    var names = document.querySelectorAll('span.scn-file');
+    function sync() {
+      var s = sel.value;
+      inputs.forEach(function (inp) {
+        if (s) inp.value = '';                 // drop any chosen upload so it can't override the scenario
+        inp.style.display = s ? 'none' : '';
+      });
+      names.forEach(function (el) {
+        el.textContent = s ? s + '/' + el.dataset.scnFile : '';
+        el.style.display = s ? 'block' : 'none';
+      });
+    }
+    sel.addEventListener('change', sync);
+    sync();                                    // also runs on page load, after a POST
+  })();
+  </script>
   {% if error %}<p class="error">{{ error }}</p>{% endif %}
 </section>
 
